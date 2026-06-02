@@ -1,0 +1,20 @@
+# 대용량 원본 데이터 (Backblaze Drive Stats 등) — git에 올리지 않음
+# 날짜별 일일 스냅샷 CSV
+data/20*.csv
+
+# 모델 학습 산출물
+data/current_storage_input.csv
+*.pkl
+models/
+
+# 파이썬
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / 에디터
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
