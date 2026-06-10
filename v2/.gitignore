@@ -33,3 +33,4 @@ k8s/secret.yaml
 Thumbs.db
 .idea/
 .vscode/
+v1/data/*.zip
