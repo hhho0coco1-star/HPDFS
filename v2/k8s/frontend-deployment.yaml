@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: pdfs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: pdfs-frontend:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pdfs-config
+                  key: API_URL
+          ports:
+            - containerPort: 8501
