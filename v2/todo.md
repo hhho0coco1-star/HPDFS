@@ -40,20 +40,12 @@
 
 ---
 
-### 9-2. 단위 테스트 (난이도: 중간)
+### 9-2. 단위 테스트 ✅ 완료
 
-> 현재 테스트 코드 없음. ML 예측 로직과 API 응답 형식 검증.
-
-- [ ] `backend/tests/` 폴더 생성
-- [ ] `backend/tests/test_predictor.py`
-  - `prob_to_level()` — 0.1 → 정상, 0.5 → 주의, 0.8 → 위험 검증
-  - `rule_level()` — smart_197_raw > 0 이면 위험 검증
-  - `combine_level()` — 더 높은 등급이 선택되는지 검증
-- [ ] `backend/tests/test_router_diagnose.py`
-  - POST /api/diagnose 응답에 serial, final_level, risk, reasons, actions 포함 여부 검증
-  - serial == MANUAL 이면 DB 저장 안 되는지 검증
-- [ ] `backend/requirements.txt`에 pytest 추가
-- [ ] pytest 실행 확인
+- [x] `backend/tests/test_predictor.py` — 16개 테스트 (prob_to_level, rule_level, combine_level)
+- [x] `backend/tests/test_router_diagnose.py` — 5개 테스트 (응답 형식, MANUAL 저장 방지, 503 방어)
+- [x] `backend/requirements.txt`에 pytest, httpx 추가
+- [x] pytest 실행 확인 — 21개 전부 통과
 
 ---
 
