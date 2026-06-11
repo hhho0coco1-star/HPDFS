@@ -73,8 +73,30 @@ flowchart TD
 | 프론트엔드 | Streamlit (로컬) | Streamlit (Docker 컨테이너) |
 | 백엔드 | 없음 | FastAPI |
 | 인프라 | 없음 | Docker Compose + Kubernetes |
-| CI/CD | 없음 | GitHub Actions + Docker Hub |
+| CI/CD | 없음 | GitHub Actions + Docker Hub (melooong/pdfs-*) |
 | 배포 | EXE 파일 | 컨테이너 이미지 |
+| 테스트 | 없음 | pytest 21개 (predictor + API 응답 검증) |
+
+---
+
+## 실행 방법 (Kubernetes)
+
+```bash
+cd HPDFS/v2
+
+# 네임스페이스 + 전체 리소스 한 번에 배포
+kubectl apply -f k8s/
+
+# Pod 상태 확인
+kubectl get pods -n pdfs
+
+# 포트 포워딩 (로컬에서 접속 시)
+kubectl port-forward svc/nginx-service 8080:80 -n pdfs
+# http://localhost:8080
+```
+
+> **k8s 주요 설정:** 4개 Pod 전부 liveness/readiness probe 설정 (httpGet / tcpSocket / exec pg_isready).  
+> resource limits으로 Pod가 서버 전체 메모리를 점유하는 상황 방지.
 
 ---
 
@@ -113,6 +135,8 @@ HPDFS/
 └── v2/                  # 클라우드 인프라 버전
     ├── agent/           # 로컬 SMART 수집 에이전트
     ├── backend/         # FastAPI 백엔드 + ML 예측
+    │   ├── models/      # 학습된 ML 모델 (.pkl)
+    │   └── tests/       # pytest 단위 테스트 (21개)
     ├── frontend/        # Streamlit 대시보드
     ├── nginx/           # Nginx 리버스 프록시
     ├── k8s/             # Kubernetes 매니페스트
@@ -128,3 +152,18 @@ HPDFS/
 - **입력**: SMART 지표 8개 (재할당섹터, 대기섹터, 정정불가섹터, 온도 등)
 - **출력**: 고장 확률(%) + 등급 (정상 / 주의 / 위험)
 - **데이터**: Backblaze HDD 고장 통계 데이터셋
+
+---
+
+## 테스트
+
+```bash
+cd v2/backend
+pytest tests/ -v
+# 21 passed
+```
+
+| 파일 | 테스트 수 | 내용 |
+|------|----------|------|
+| `tests/test_predictor.py` | 16개 | prob_to_level, rule_level, combine_level 경계값 검증 |
+| `tests/test_router_diagnose.py` | 5개 | API 응답 형식, MANUAL 저장 방지, 503 방어 |
