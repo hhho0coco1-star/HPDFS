@@ -119,3 +119,12 @@ def inject_demo(db: Session = Depends(get_db)) -> dict[str, Any]:
             ))
     db.commit()
     return {"message": f"더미 디스크 {len(demo_disks())}개 주입 완료"}
+
+
+@router.delete("/demo")
+def clear_demo(db: Session = Depends(get_db)) -> dict[str, Any]:
+    """발표용 더미 데이터 DB에서 삭제"""
+    demo_serials = [d["serial"] for d in demo_disks()]
+    deleted = db.query(Disk).filter(Disk.serial.in_(demo_serials)).delete(synchronize_session=False)
+    db.commit()
+    return {"message": f"더미 디스크 {deleted}개 삭제 완료"}

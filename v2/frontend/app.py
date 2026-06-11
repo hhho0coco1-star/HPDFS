@@ -338,6 +338,18 @@ def inject_demo() -> bool:
         return False
 
 
+def clear_demo() -> bool:
+    try:
+        res = requests.delete(f"{API_URL}/api/demo", timeout=5)
+        res.raise_for_status()
+        msg = res.json().get("message", "완료")
+        st.success(msg)
+        return True
+    except Exception as e:
+        st.error(f"데모 데이터 삭제 실패: {e}")
+        return False
+
+
 def update_action_status(serial: str, action_status: str) -> bool:
     try:
         res = requests.patch(
@@ -699,12 +711,20 @@ def render_detail_page(serial: str):
 # =========================================================
 render_header()
 
+if "demo_active" not in st.session_state:
+    st.session_state.demo_active = False
+
 with st.sidebar:
     st.title("PDFS")
     page = st.radio("화면", ["대시보드", "자동진단", "수동진단", "디스크 상세", "컬럼 설명"])
     st.divider()
-    if st.button("데모 데이터 주입"):
-        inject_demo()
+    demo_mode = st.toggle("데모 모드", value=st.session_state.demo_active)
+    if demo_mode != st.session_state.demo_active:
+        st.session_state.demo_active = demo_mode
+        if demo_mode:
+            inject_demo()
+        else:
+            clear_demo()
         st.rerun()
     st.caption(f"API: {API_URL}")
 
@@ -719,7 +739,7 @@ if page == "대시보드":
         render_toast(disks)
     else:
         st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
-        st.info("디스크 데이터가 없습니다. 사이드바에서 '데모 데이터 주입'을 눌러보세요.")
+        st.info("디스크 데이터가 없습니다. 사이드바에서 '데모 모드'를 켜보세요.")
 
 # ─── 자동진단 ───────────────────────────────────────────
 elif page == "자동진단":
