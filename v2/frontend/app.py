@@ -326,6 +326,14 @@ def diagnose_manual(payload: dict) -> dict[str, Any] | None:
         return None
 
 
+def get_demo_status() -> bool:
+    try:
+        res = requests.get(f"{API_URL}/api/demo", timeout=5)
+        return res.json().get("active", False)
+    except Exception:
+        return False
+
+
 def inject_demo() -> bool:
     try:
         res = requests.post(f"{API_URL}/api/demo", timeout=5)
@@ -712,7 +720,7 @@ def render_detail_page(serial: str):
 render_header()
 
 if "demo_active" not in st.session_state:
-    st.session_state.demo_active = False
+    st.session_state.demo_active = get_demo_status()
 
 with st.sidebar:
     st.title("PDFS")

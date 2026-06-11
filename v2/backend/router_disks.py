@@ -102,6 +102,14 @@ def update_status(serial: str, body: StatusUpdate, db: Session = Depends(get_db)
     return {"serial": serial, "action_status": body.action_status}
 
 
+@router.get("/demo")
+def demo_status(db: Session = Depends(get_db)) -> dict[str, Any]:
+    """데모 데이터 활성 여부 확인"""
+    demo_serials = [d["serial"] for d in demo_disks()]
+    count = db.query(Disk).filter(Disk.serial.in_(demo_serials)).count()
+    return {"active": count > 0}
+
+
 @router.post("/demo")
 def inject_demo(db: Session = Depends(get_db)) -> dict[str, Any]:
     """발표용 더미 데이터 DB에 주입"""
