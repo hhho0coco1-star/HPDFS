@@ -374,14 +374,18 @@
       </div>
       <div class="layer">
         <div class="layer-label" style="color:#c9b1ff;">서버</div>
-        <div class="layer-nodes">
-          <div class="layer-node server">🔀 Nginx<br><span style="font-size:11px;font-weight:400;">라우팅 :80</span></div>
-          <div class="layer-pipe">→</div>
-          <div class="layer-node server">⚡ FastAPI<br><span style="font-size:11px;font-weight:400;">ML 예측 :8010</span></div>
-          <div class="layer-pipe">↔</div>
-          <div class="layer-node db">🗄️ PostgreSQL<br><span style="font-size:11px;font-weight:400;">데이터 저장</span></div>
-          <div class="layer-pipe">|</div>
-          <div class="layer-node server">📊 Streamlit<br><span style="font-size:11px;font-weight:400;">대시보드 :8501</span></div>
+        <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+          <div class="layer-nodes">
+            <div class="layer-node server">🔀 Nginx<br><span style="font-size:11px;font-weight:400;">라우팅 :80</span></div>
+            <div class="layer-pipe">→</div>
+            <div class="layer-node server">⚡ FastAPI<br><span style="font-size:11px;font-weight:400;">ML 예측 :8010</span></div>
+            <div class="layer-pipe">↔</div>
+            <div class="layer-node db">🗄️ PostgreSQL<br><span style="font-size:11px;font-weight:400;">데이터 저장</span></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; padding-left:12px;">
+            <span style="font-size:14px; color:#8b949e;">└→</span>
+            <div class="layer-node server">📊 Streamlit<br><span style="font-size:11px;font-weight:400;">대시보드 :8501</span></div>
+          </div>
         </div>
       </div>
       <div class="layer" style="gap:12px;">
