@@ -211,81 +211,55 @@ GitHub push
 
 ### 🔴 즉시 수정 (기능 버그)
 
-- [ ] **[router_disks.py:59] 진단 이력 조회 버그**
-  - `DiagnosisLog.device == serial` → `DiagnosisLog.serial == serial` 로 수정
-  - 현재 디스크 상세 화면에서 진단 이력이 조회 안 됨
+- [x] **[router_disks.py:59] 진단 이력 조회 버그** ✅
+  - DiagnosisLog.serial 컬럼 추가 + 필터 수정 + DB 볼륨 초기화 완료
 
-- [ ] **[agent/requirements.txt] 파일 누락**
-  - agent 실행에 필요한 `pandas`, `requests` 패키지 명세 파일 없음
-  - `start_agent.bat`에서 pip install 못 함
+- [x] **[agent/requirements.txt] 파일 누락** ✅
+  - pandas, requests 명세 파일 생성 완료
 
 ### 🟡 보안 (GitHub push 전 필수)
 
-- [ ] **[k8s/secret.yaml] .gitignore 추가**
-  - Base64는 암호화 아님 → Git에 커밋되면 비밀번호 노출
-  - `.gitignore`에 `k8s/secret.yaml` 추가
-
-- [ ] **[k8s/configmap.yaml] DATABASE_URL에서 비밀번호 분리**
-  - `postgresql://pdfs:pdfs1234@...` 형태로 비밀번호 평문 저장 중
-  - DB 접속 정보를 secret으로 이동
-
-- [ ] **[backend/database.py:9] 하드코딩 비밀번호 제거**
-  - 환경변수 없을 때 `pdfs1234` 기본값 노출
-  - 기본값 제거 또는 개발 전용 .env로만 관리
-
-- [ ] **[backend/main.py:30] CORS `allow_origins=["*"]` 제한**
-  - 모든 도메인에서 API 호출 가능 → 운영 시 실제 도메인으로 제한
+- [x] **[k8s/secret.yaml] .gitignore 추가** ✅
+- [x] **[k8s/configmap.yaml] DATABASE_URL에서 비밀번호 분리** ✅
+  - secret.yaml로 이동, backend-deployment.yaml secretKeyRef로 변경
+- [x] **[backend/database.py:9] 하드코딩 비밀번호 제거** ✅
+  - 환경변수 없으면 RuntimeError 발생
+- [x] **[backend/main.py:30] CORS `allow_origins=["*"]` 제한** ✅
+  - ALLOWED_ORIGINS 환경변수 기반으로 변경 (기본값: http://localhost)
 
 ### 🟢 개선 권장 (여유 시)
 
-- [ ] **[backend/models.py] DiagnosisLog에 serial 컬럼 추가**
-  - 현재 device 경로 기반 → 같은 디스크가 경로 바뀌면 이력 분리됨
-  - serial 컬럼 추가 후 router_diagnose.py에서 저장 시 함께 기록
-
-- [ ] **[k8s/*.yaml] imagePullPolicy: Never → IfNotPresent**
-  - 현재 설정은 로컬 전용 — CI/CD 연결 시 이미지 pull 안 됨
-
-- [ ] **[backend/main.py:14] 모델 파일 로드 에러 핸들링**
-  - 모델 파일 없으면 앱 시작 실패 → try-except로 경고만 출력하도록
+- [x] **[backend/models.py] DiagnosisLog에 serial 컬럼 추가** ✅
+- [x] **[k8s/*.yaml] imagePullPolicy: Never → IfNotPresent** ✅
+- [x] **[backend/main.py:14] 모델 파일 로드 에러 핸들링** ✅
 
 ---
 
-## 7단계 — GitHub Actions CI/CD
+## 7단계 — GitHub Actions CI/CD ✅ 완료
 
 > 방식: A (빌드 + Docker Hub push, 서버 배포 제외)
 
-### 7-1. 사전 준비
-- [ ] Docker Hub 계정 생성 및 로그인 확인
-- [ ] GitHub 저장소에 Secrets 등록
-  - `DOCKER_USERNAME` — Docker Hub 아이디
-  - `DOCKER_PASSWORD` — Docker Hub 비밀번호 또는 Access Token
-- [ ] `.gitignore` 정비 (secret.yaml, .env 제외 확인)
+### 7-1. 사전 준비 ✅
+- [x] Docker Hub 계정 생성 (melooong)
+- [x] GitHub Secrets 등록 (DOCKER_USERNAME, DOCKER_PASSWORD)
+- [x] .gitignore 정비 완료
 
-### 7-2. .github/workflows/deploy.yml 작성
-- [ ] 트리거: main 브랜치 push 시 자동 실행
-- [ ] job 1 — backend 이미지 빌드 + Docker Hub push
-- [ ] job 2 — frontend 이미지 빌드 + Docker Hub push
-- [ ] job 3 — nginx 이미지 빌드 + Docker Hub push
-- [ ] 이미지 태그: `latest` + `git SHA` 병행
+### 7-2. .github/workflows/deploy.yml 작성 ✅
+- [x] 트리거: main 브랜치 push 시 자동 실행
+- [x] backend / frontend / nginx 이미지 빌드 + Docker Hub push
+- [x] 이미지 태그: latest + git SHA 병행
 
 ### 7-3. CI/CD 테스트
-- [ ] main 브랜치에 코드 push
 - [ ] GitHub Actions 탭에서 워크플로우 실행 확인
-- [ ] Docker Hub에 이미지 올라갔는지 확인
+- [ ] Docker Hub(melooong)에 이미지 올라갔는지 확인
 
 ---
 
-## 8단계 — 아키텍처 시각화
+## 8단계 — 아키텍처 시각화 ✅ 완료
 
-### 8-1. v1 vs v2 아키텍처 비교 다이어그램
-- [ ] v1 온프레미스 EXE 구조 시각화
-  - 사용자 PC → EXE → smartctl → ML 예측 → CSV 저장 → Streamlit 렌더링
-- [ ] v2 클라우드 인프라 구조 시각화
-  - 로컬 에이전트 → Nginx → FastAPI → PostgreSQL → Streamlit
-  - GitHub Actions → Docker Hub → 서버 자동 배포
-  - Kubernetes Pod 구조
-- [ ] 시각화 도구 선택 (draw.io / Mermaid / excalidraw)
-- [ ] docs/ 폴더에 이미지 + 마크다운으로 저장
+- [x] README.md — Mermaid 다이어그램 (v1/v2 아키텍처), 기술스택 비교표, 스크린샷
+- [x] v2/docs/presentation.html — 8슬라이드 HTML 발표자료 (애니메이션 효과 포함)
+- [x] v2/docs/images/ — 대시보드·디스크상세 스크린샷
 
 ---
 
