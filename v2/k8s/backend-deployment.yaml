@@ -25,3 +25,23 @@ spec:
                   key: DATABASE_URL
           ports:
             - containerPort: 8010
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8010
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8010
+            initialDelaySeconds: 5
+            periodSeconds: 10

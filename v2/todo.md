@@ -28,31 +28,15 @@
 > Pod 내부 앱이 죽었을 때 k8s가 HTTP 수준으로 감지해 자동 재시작하는 기능.
 > resource limits 미설정 시 하나의 Pod가 서버 전체 메모리를 점유할 수 있음.
 
-- [ ] `k8s/backend-deployment.yaml` — liveness probe 추가
-  ```yaml
-  livenessProbe:
-    httpGet:
-      path: /
-      port: 8010
-    initialDelaySeconds: 10
-    periodSeconds: 30
-  ```
-- [ ] `k8s/backend-deployment.yaml` — readiness probe 추가
-  ```yaml
-  readinessProbe:
-    httpGet:
-      path: /
-      port: 8010
-    initialDelaySeconds: 5
-    periodSeconds: 10
-  ```
-- [ ] `k8s/frontend-deployment.yaml` — liveness probe 추가 (port: 8501, path: /)
-- [ ] `k8s/nginx-deployment.yaml` — liveness probe 추가 (port: 80, path: /)
-- [ ] 4개 deployment에 resource limits/requests 설정
-  - backend:  cpu 500m / memory 512Mi
-  - frontend: cpu 300m / memory 512Mi
-  - nginx:    cpu 100m / memory 128Mi
-  - postgres: cpu 300m / memory 256Mi
+- [x] `k8s/backend-deployment.yaml` — liveness/readiness probe 추가 (httpGet /)
+- [x] `k8s/frontend-deployment.yaml` — liveness/readiness probe 추가 (tcpSocket 8501)
+- [x] `k8s/nginx-deployment.yaml` — liveness/readiness probe 추가 (httpGet /)
+- [x] `k8s/postgres-deployment.yaml` — liveness/readiness probe 추가 (pg_isready)
+- [x] 4개 deployment resource limits/requests 설정 완료
+  - backend:  cpu 200m~500m / memory 256Mi~512Mi
+  - frontend: cpu 200m~300m / memory 256Mi~512Mi
+  - nginx:    cpu 50m~100m  / memory 64Mi~128Mi
+  - postgres: cpu 200m~300m / memory 256Mi
 
 ---
 
