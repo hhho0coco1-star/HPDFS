@@ -24,8 +24,6 @@ venv/
 # 환경변수 (DB 접속 정보 등 민감 정보)
 .env
 
-# Kubernetes 시크릿 (Base64 비밀번호 포함)
-k8s/secret.yaml
 
 # OS / 에디터
 .DS_Store
