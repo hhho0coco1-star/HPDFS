@@ -18,6 +18,8 @@
 | 7단계 | GitHub Actions CI/CD (Docker Hub push, 6회 성공 확인) | ✅ |
 | 8단계 | 아키텍처 시각화 (README Mermaid, HTML 발표자료 8슬라이드) | ✅ |
 | 중간발표 점검 | 버그 수정 8건, 슬라이드 수정 5건 | ✅ |
+| 9-1 | k8s liveness/readiness probe + resource limits 4개 Pod | ✅ |
+| 9-2 | 단위 테스트 21개 (predictor 16 + router_diagnose 5) | ✅ |
 
 ---
 
@@ -49,7 +51,7 @@
 
 ---
 
-### 9-3. 확장 예측 기능 (난이도: 중간)
+### 9-3. 확장 예측 기능 (난이도: 중간) — 다음 작업
 
 > battery_best_model.pkl, symptom_best_model.pkl 이미 학습 완료. 연동만 하면 됨.
 
