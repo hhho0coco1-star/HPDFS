@@ -235,6 +235,22 @@ GitHub push
 
 ---
 
+## 중간발표 전 최종 점검 (2026-06-11) ✅ 완료
+
+- [x] storage_best_model.pkl git 포함 (.gitignore 예외 처리)
+- [x] router_diagnose.py ML 모델 미로드 시 KeyError → 503 방어
+- [x] k8s/secret.yaml gitignore 제거 → git 포함 (포트폴리오 수준)
+- [x] k8s 이미지 이름 Docker Hub 주소로 변경 (melooong/pdfs-*)
+- [x] 슬라이드 1 risk 수치 수정 (0.21 → 21.0)
+- [x] 슬라이드 1 터미널 reasons/actions 실제 API 응답과 일치
+- [x] 슬라이드 4 Streamlit 연결 구조 명확화 (Nginx 분기 표현)
+- [x] 슬라이드 6 step4 수동 배포임을 명확히 표기
+- [x] 슬라이드 7 "동일 매니페스트 즉시 배포" → 이미지 이름 교체 필요 명시
+- [x] GitHub Actions 6회 전부 성공 확인
+- [x] Docker Hub pdfs-backend/frontend/nginx 이미지 확인
+
+---
+
 ## 7단계 — GitHub Actions CI/CD ✅ 완료
 
 > 방식: A (빌드 + Docker Hub push, 서버 배포 제외)
@@ -249,9 +265,9 @@ GitHub push
 - [x] backend / frontend / nginx 이미지 빌드 + Docker Hub push
 - [x] 이미지 태그: latest + git SHA 병행
 
-### 7-3. CI/CD 테스트
-- [ ] GitHub Actions 탭에서 워크플로우 실행 확인
-- [ ] Docker Hub(melooong)에 이미지 올라갔는지 확인
+### 7-3. CI/CD 테스트 ✅
+- [x] GitHub Actions 탭에서 워크플로우 실행 확인 (6회 전부 성공)
+- [x] Docker Hub(melooong)에 이미지 올라갔는지 확인 (pdfs-backend/frontend/nginx 확인)
 
 ---
 
