@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: pdfs-backend:latest
+          image: melooong/pdfs-backend:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: DATABASE_URL

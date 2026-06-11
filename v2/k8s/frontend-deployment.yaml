@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: pdfs-frontend:latest
+          image: melooong/pdfs-frontend:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: API_URL
