@@ -48,6 +48,9 @@ def diagnose(request: Request, data: SmartData, db: Session = Depends(get_db)) -
     }], columns=FEATURES)
 
     # ② ML 예측
+    if "storage" not in ml_models:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=503, detail="ML 모델이 로드되지 않았습니다. 서버 로그를 확인하세요.")
     result = predict(df, ml_models["storage"])
 
     is_manual = data.serial == "MANUAL"
