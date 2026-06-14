@@ -24,7 +24,7 @@
 ```mermaid
 flowchart LR
     A[사용자 PC] -->|smartctl 실행| B[SMART 수집]
-    B --> C[ML 예측\nGradientBoosting]
+    B --> C[ML 예측\nRandomForest]
     C --> D[CSV 저장]
     D --> E[Streamlit\n로컬 렌더링]
 ```
@@ -68,7 +68,7 @@ flowchart TD
 | 영역 | v1 | v2 |
 |------|----|----|
 | 데이터 수집 | smartctl (EXE 내장) | 로컬 에이전트 (Python) |
-| ML 예측 | GradientBoosting (로컬) | GradientBoosting (FastAPI 서버) |
+| ML 예측 | RandomForest (로컬) | RandomForest (FastAPI 서버) |
 | 저장 | CSV 파일 | PostgreSQL |
 | 프론트엔드 | Streamlit (로컬) | Streamlit (Docker 컨테이너) |
 | 백엔드 | 없음 | FastAPI |
@@ -148,7 +148,7 @@ HPDFS/
 
 ## ML 모델
 
-- **알고리즘**: GradientBoostingClassifier
+- **알고리즘**: RandomForestClassifier
 - **입력**: SMART 지표 8개 (재할당섹터, 대기섹터, 정정불가섹터, 온도 등)
 - **출력**: 고장 확률(%) + 등급 (정상 / 주의 / 위험)
 - **데이터**: Backblaze HDD 고장 통계 데이터셋
