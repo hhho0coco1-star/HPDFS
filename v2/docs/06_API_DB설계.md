@@ -176,3 +176,69 @@
 | 진단 이력 시계열 차트 | CSV 로그 날짜별 집계 → Streamlit 차트 |
 | 모델 임계값 조정 UI | `storage_threshold.json` 값을 슬라이더로 조정 |
 | MLflow 실험 추적 | 학습 단계에 MLflow 연동 |
+
+---
+
+## 10. DB 테이블 정의서
+
+> ORM: SQLAlchemy · DB: PostgreSQL · 연결: `DATABASE_URL` 환경변수 (`.env`)
+> 정의 파일: `backend/models.py` · 연결 파일: `backend/database.py`
+
+---
+
+### 10-1. `diagnosis_log` — 진단 이력 누적
+
+진단할 때마다 행이 추가된다. 같은 디스크를 여러 번 진단하면 행이 계속 쌓인다.
+
+| 컬럼 | 타입 | 기본값 | 설명 |
+|------|------|--------|------|
+| `id` | Integer | PK, 자동증가 | 행 고유 ID |
+| `timestamp` | DateTime | 현재 시각 | 진단 시각 |
+| `serial` | String | — | 디스크 시리얼 번호 (인덱스) |
+| `device` | String | — | 연결 경로 (`/dev/sda -d ata` 등) |
+| `model` | String | — | 디스크 모델명 |
+| `capacity_bytes` | BigInteger | — | 용량 (바이트) |
+| `smart_5_raw` | Integer | 0 | 재할당 섹터 수 |
+| `smart_9_raw` | Integer | 0 | 가동 시간 (Power-On Hours) |
+| `smart_187_raw` | Integer | 0 | 정정불가 에러 보고 |
+| `smart_188_raw` | Integer | 0 | 명령 타임아웃 |
+| `smart_194_raw` | Integer | 0 | 온도 (℃) |
+| `smart_197_raw` | Integer | 0 | 대기(보류) 섹터 수 |
+| `smart_198_raw` | Integer | 0 | 오프라인 정정불가 섹터 |
+| `smart_199_raw` | Integer | 0 | UDMA CRC 에러 수 |
+| `ml_probability` | Float | — | ML 고장 확률 (0.0 ~ 1.0) |
+| `ml_level` | String | — | ML 등급 (정상 / 주의 / 위험) |
+| `rule_level` | String | — | 규칙 기반 등급 (정상 / 주의 / 위험) |
+| `final_level` | String | — | 최종 등급 = max(ml_level, rule_level) |
+
+---
+
+### 10-2. `disks` — 디스크별 최신 상태
+
+디스크 1개당 1행만 유지한다. 재진단 시 해당 `serial` 행을 덮어쓴다. 대시보드 표시용.
+
+| 컬럼 | 타입 | 기본값 | 설명 |
+|------|------|--------|------|
+| `serial` | String | PK | 디스크 시리얼 번호 (고유 식별자) |
+| `device` | String | — | 연결 경로 (참고용) |
+| `model` | String | — | 디스크 모델명 |
+| `capacity_bytes` | BigInteger | — | 용량 (바이트) |
+| `final_level` | String | — | 최종 등급 (정상 / 주의 / 위험) |
+| `risk` | Float | — | 위험도 % (ml_probability × 100) |
+| `action_status` | String | `"미확인"` | 조치 상태 (미확인 / 확인됨 / 조치완료) — F-08 |
+| `last_updated` | DateTime | 현재 시각 | 마지막 업데이트 시각 |
+
+---
+
+### 10-3. 테이블 관계
+
+```
+diagnosis_log (이력)          disks (최신 상태)
+─────────────────────         ─────────────────────
+id          PK                serial        PK
+serial      ──────────────── serial
+...                           ...
+```
+
+- `diagnosis_log.serial` → `disks.serial` 참조 (논리적 관계, FK 미설정)
+- 진단 1회 = `diagnosis_log` INSERT + `disks` UPSERT (serial 기준)
