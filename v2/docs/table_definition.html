@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HPDFS 테이블 정의서</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0d1117;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 12px 18px;
+  gap: 10px;
+}
+
+/* ── 헤더 ── */
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.head-left {}
+.title { font-size: 17px; font-weight: 900; color: #e6edf3; }
+.subtitle { font-size: 11px; color: #8b949e; margin-top: 2px; }
+.head-badges { display: flex; gap: 6px; align-items: center; }
+.hbadge {
+  font-size: 10px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+  border: 1px solid #30363d;
+  color: #8b949e; background: #161b22;
+}
+.hbadge.pg  { border-color: #1f6feb; color: #58a6ff; background: #0d1825; }
+.hbadge.orm { border-color: #388e3c; color: #3fb950; background: #0d2318; }
+
+/* ── 탭 ── */
+.nav { display: flex; gap: 5px; flex-shrink: 0; }
+.nav-btn {
+  font-size: 11px; font-weight: 700;
+  padding: 5px 14px; border-radius: 20px;
+  border: 1.5px solid #30363d;
+  background: #161b22; color: #8b949e; cursor: pointer;
+  transition: all .15s; white-space: nowrap;
+}
+.nav-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+.nav-btn.active { background: #1f6feb; color: #fff; border-color: #1f6feb; }
+
+/* ── 장면 ── */
+.scene { display: none; flex: 1; min-height: 0; flex-direction: column; gap: 9px; }
+.scene.active { display: flex; }
+
+/* ── 공통 박스 ── */
+.box {
+  border-radius: 10px;
+  border: 1px solid #30363d;
+  background: #161b22;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.box-head {
+  padding: 8px 16px;
+  font-size: 11px; font-weight: 700; letter-spacing: .4px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #21262d;
+  flex-shrink: 0;
+}
+.box-body {
+  flex: 1; overflow-y: auto; padding: 14px 16px;
+}
+.box-body::-webkit-scrollbar { width: 3px; }
+.box-body::-webkit-scrollbar-thumb { background: #30363d; border-radius: 2px; }
+
+/* ══ SCENE 1 — 개요 ══ */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  flex: 1;
+  min-height: 0;
+}
+.desc-text {
+  font-size: 13px; color: #8b949e; line-height: 1.8;
+}
+.desc-text b { color: #c9d1d9; }
+
+.tbl-list {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.tbl-list th {
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .3px;
+  color: #8b949e; text-transform: uppercase;
+  border-bottom: 1px solid #21262d;
+  background: #0d1117;
+}
+.tbl-list td {
+  padding: 9px 12px;
+  border-bottom: 1px solid #1c2128;
+  color: #c9d1d9;
+  vertical-align: top;
+}
+.tbl-list tr:last-child td { border-bottom: none; }
+.tbl-list tr:hover td { background: #1c2128; }
+.tbl-name {
+  font-family: "Consolas", monospace;
+  font-size: 12px; font-weight: 700;
+  color: #79c0ff;
+}
+.tbl-ko { font-size: 12px; color: #e6edf3; }
+.tbl-desc { font-size: 12px; color: #8b949e; }
+
+/* ══ SCENE 2 — ERD ══ */
+.erd-wrap {
+  flex: 1; display: flex; gap: 9px; min-height: 0;
+}
+.erd-diagram {
+  flex: 0 0 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+.erd-table-box {
+  width: 280px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid;
+}
+.erd-table-box.disks-box { border-color: #1f6feb; }
+.erd-table-box.log-box   { border-color: #388e3c; }
+.erd-table-head {
+  padding: 8px 14px;
+  font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; gap: 8px;
+}
+.disks-box .erd-table-head { background: #0d1825; color: #58a6ff; }
+.log-box   .erd-table-head { background: #0d2318; color: #3fb950; }
+.erd-table-head .tname {
+  font-family: "Consolas", monospace; font-size: 13px;
+}
+.erd-table-cols {
+  background: #161b22;
+  padding: 8px 0;
+}
+.erd-col-row {
+  display: flex; align-items: center;
+  padding: 4px 14px; gap: 8px;
+  font-size: 11.5px;
+}
+.erd-col-row:hover { background: #1c2128; }
+.col-key {
+  font-size: 9px; font-weight: 800; padding: 2px 5px;
+  border-radius: 3px; flex-shrink: 0; width: 28px; text-align: center;
+}
+.col-key.pk { background: #2d1b00; color: #f0a040; border: 1px solid #7a4500; }
+.col-key.fk { background: #1a2500; color: #85d34a; border: 1px solid #3a5a10; }
+.col-key.-- { background: transparent; color: transparent; border: 1px solid transparent; }
+.col-name { font-family: "Consolas", monospace; color: #79c0ff; font-size: 11.5px; }
+.col-type { color: #6e7681; font-size: 10.5px; margin-left: auto; }
+
+.erd-rel {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 6px 0; gap: 2px;
+}
+.erd-rel-line {
+  width: 2px; height: 14px; background: #30363d;
+}
+.erd-rel-badge {
+  font-size: 11px; font-weight: 800;
+  padding: 3px 14px; border-radius: 20px;
+  background: #1c2128; color: #8b949e;
+  border: 1px solid #30363d;
+}
+.erd-rel-key {
+  font-family: "Consolas", monospace;
+  font-size: 10px; color: #6e7681;
+}
+
+.erd-note {
+  flex: 1; min-height: 0;
+}
+.note-item {
+  display: flex; gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #21262d;
+  font-size: 12.5px; line-height: 1.7;
+}
+.note-item:last-child { border-bottom: none; }
+.note-icon { flex-shrink: 0; font-size: 14px; }
+.note-text { color: #8b949e; }
+.note-text b { color: #c9d1d9; }
+
+/* ══ SCENE 3, 4 — 테이블 상세 ══ */
+.col-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.col-table th {
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .3px;
+  color: #8b949e; text-transform: uppercase;
+  border-bottom: 2px solid #21262d;
+  background: #0d1117;
+  white-space: nowrap;
+}
+.col-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #1c2128;
+  vertical-align: middle;
+}
+.col-table tr:last-child td { border-bottom: none; }
+.col-table tr:hover td { background: #1c2128; }
+
+.td-name {
+  font-family: "Consolas", monospace;
+  color: #79c0ff; font-size: 12px; font-weight: 600;
+  white-space: nowrap;
+}
+.td-type {
+  font-family: "Consolas", monospace;
+  color: #ce9178; font-size: 11.5px;
+  white-space: nowrap;
+}
+.td-key {}
+.td-null { color: #6e7681; font-size: 11.5px; white-space: nowrap; }
+.td-default {
+  font-family: "Consolas", monospace;
+  color: #b5cea8; font-size: 11px;
+  white-space: nowrap;
+}
+.td-desc { color: #8b949e; font-size: 12px; line-height: 1.5; }
+.td-desc b { color: #c9d1d9; }
+
+.pill {
+  display: inline-block;
+  font-size: 9.5px; font-weight: 800; padding: 2px 7px;
+  border-radius: 4px; white-space: nowrap;
+}
+.pill-pk { background: #2d1b00; color: #f0a040; border: 1px solid #7a4500; }
+.pill-fk { background: #1a2500; color: #85d34a; border: 1px solid #3a5a10; }
+.pill-smart { background: #0d1825; color: #58a6ff; border: 1px solid #1f4080; }
+
+.table-desc-bar {
+  background: #1c2128; border: 1px solid #30363d;
+  border-radius: 8px; padding: 10px 14px;
+  font-size: 12.5px; color: #8b949e; line-height: 1.7;
+  flex-shrink: 0;
+}
+.table-desc-bar b { color: #c9d1d9; }
+
+/* ══ SCENE 5 — 판정 등급 ══ */
+.grade-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  flex: 0 0 auto;
+}
+.grade-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.grade-table th {
+  padding: 7px 10px;
+  text-align: left;
+  font-size: 10.5px; font-weight: 700;
+  color: #8b949e; text-transform: uppercase;
+  border-bottom: 2px solid #21262d;
+  background: #0d1117;
+}
+.grade-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #1c2128;
+  vertical-align: middle;
+}
+.grade-table tr:last-child td { border-bottom: none; }
+
+.level-badge {
+  display: inline-block; font-size: 11px; font-weight: 800;
+  padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+}
+.level-정상 { background: #0d2318; color: #3fb950; border: 1px solid #1a4a2a; }
+.level-주의 { background: #2a1f00; color: #f0a040; border: 1px solid #7a4500; }
+.level-위험 { background: #2d1010; color: #f85149; border: 1px solid #6b2020; }
+
+.grade-range {
+  font-family: "Consolas", monospace;
+  font-size: 11.5px; color: #79c0ff;
+}
+.grade-cond { font-size: 12px; color: #8b949e; line-height: 1.6; }
+.grade-note { font-size: 11px; color: #6e7681; }
+
+.action-wrap { flex: 1; min-height: 0; }
+.action-row {
+  display: flex; gap: 9px;
+}
+.action-card {
+  flex: 1; border-radius: 8px; padding: 14px 16px;
+  border: 1px solid;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.action-card.미확인 { background: #0d1117; border-color: #30363d; }
+.action-card.확인됨 { background: #0d1825; border-color: #1f4080; }
+.action-card.조치완료 { background: #0d2318; border-color: #1a4a2a; }
+.action-label {
+  font-size: 13px; font-weight: 800;
+}
+.미확인 .action-label { color: #8b949e; }
+.확인됨 .action-label { color: #58a6ff; }
+.조치완료 .action-label { color: #3fb950; }
+.action-desc { font-size: 12px; color: #6e7681; line-height: 1.6; }
+
+.final-note {
+  background: #1c2128; border-left: 3px solid #d29922;
+  border-radius: 6px; padding: 10px 14px;
+  font-size: 12.5px; color: #8b949e; line-height: 1.7;
+  flex-shrink: 0;
+}
+.final-note b { color: #f0a040; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 헤더 -->
+  <div class="head">
+    <div class="head-left">
+      <div class="title">🗄️ HPDFS 테이블 정의서</div>
+      <div class="subtitle">Predictive Drive Failure System · 작성일: 2026-06-12</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div class="head-badges">
+        <span class="hbadge pg">PostgreSQL</span>
+        <span class="hbadge orm">SQLAlchemy ORM</span>
+        <span class="hbadge">테이블 2개</span>
+      </div>
+      <div class="nav">
+        <button class="nav-btn active" onclick="show('S1',this)">개요</button>
+        <button class="nav-btn" onclick="show('S2',this)">ERD</button>
+        <button class="nav-btn" onclick="show('S3',this)">diagnosis_log</button>
+        <button class="nav-btn" onclick="show('S4',this)">disks</button>
+        <button class="nav-btn" onclick="show('S5',this)">판정 등급</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ S1 개요 ══ -->
+  <div id="S1" class="scene active">
+    <div class="overview-grid">
+
+      <div class="box">
+        <div class="box-head" style="color:#58a6ff;border-top:3px solid #1f6feb;">📋 프로젝트 개요</div>
+        <div class="box-body">
+          <p class="desc-text">
+            HPDFS API는 하드디스크 <b>SMART 수치</b>를 수집하여 <b>ML 모델</b>과 <b>규칙 기반 로직</b>으로
+            고장 위험도를 예측하는 시스템입니다.<br><br>
+            데이터베이스는 <b>PostgreSQL</b>을 사용하며 <b>SQLAlchemy ORM</b>으로 관리됩니다.
+            총 <b>2개의 테이블</b>로 구성됩니다.<br><br>
+            진단 요청마다 로그를 누적하는 <code style="background:#1c2128;padding:1px 6px;border-radius:3px;font-size:11.5px;color:#79c0ff;">diagnosis_log</code>와,
+            디스크별 최신 상태만 유지하는 <code style="background:#1c2128;padding:1px 6px;border-radius:3px;font-size:11.5px;color:#79c0ff;">disks</code>로 역할이 분리됩니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-head" style="color:#3fb950;border-top:3px solid #388e3c;">📌 테이블 목록</div>
+        <div class="box-body" style="padding:0;">
+          <table class="tbl-list">
+            <thead>
+              <tr>
+                <th>테이블명</th>
+                <th>한글명</th>
+                <th>설명</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="tbl-name">diagnosis_log</span></td>
+                <td><span class="tbl-ko">진단 로그</span></td>
+                <td><span class="tbl-desc">진단 요청마다 SMART 수치와 예측 결과를 누적 저장</span></td>
+              </tr>
+              <tr>
+                <td><span class="tbl-name">disks</span></td>
+                <td><span class="tbl-ko">디스크 현황</span></td>
+                <td><span class="tbl-desc">디스크별 최신 상태만 보관 — 대시보드 표시용</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ S2 ERD ══ -->
+  <div id="S2" class="scene">
+    <div class="erd-wrap">
+
+      <div class="box" style="flex:0 0 360px;">
+        <div class="box-head" style="color:#d29922;border-top:3px solid #d29922;">🔗 ERD 관계도</div>
+        <div class="box-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:20px 16px;">
+
+          <div class="erd-table-box disks-box">
+            <div class="erd-table-head"><span class="tname">disks</span><span style="font-size:10px;opacity:.7;">디스크 현황</span></div>
+            <div class="erd-table-cols">
+              <div class="erd-col-row"><span class="col-key pk">PK</span><span class="col-name">serial</span><span class="col-type">VARCHAR</span></div>
+              <div class="erd-col-row"><span class="col-key --">--</span><span class="col-name">device</span><span class="col-type">VARCHAR</span></div>
+              <div class="erd-col-row"><span class="col-key --">--</span><span class="col-name">model</span><span class="col-type">VARCHAR</span></div>
+              <div class="erd-col-row"><span class="col-key --">--</span><span class="col-name">final_level</span><span class="col-type">VARCHAR</span></div>
+              <div class="erd-col-row"><span class="col-key --">--</span><span class="col-name">risk</span><span class="col-type">FLOAT</span></div>
+              <div class="erd-col-row"><span class="col-key --">--</span><span class="col-name">action_status</span><span class="col-type">VARCHAR</span></div>
+            </div>
+          </div>
+
+          <div class="erd-rel">
+            <div class="erd-rel-line"></div>
+            <div class="erd-rel-badge">1 : N</div>
+            <div class="erd-rel-key">serial 기준</div>
+            <div class="erd-rel-line"></div>
+          </div>
+
+          <div class="erd-table-box log-box">
+            <div class="erd-table-head"><span class="tname">diagnosis_log</span><span style="font-size:10px;opacity:.7;">진단 로그</span></div>
+            <div class="erd-table-cols">
+              <div class="erd-col-row"><span class="col-key pk">PK</span><span class="col-name">id</span><span class="col-type">INTEGER</span></div>
+              <div class="erd-col-row"><span class="col-key fk">FK</span><span class="col-name">serial</span><span class="col-type">VARCHAR</span></div>
+              <div class="erd-col-row"><span class="col-key --">--</span><span class="col-name">smart_5_raw ~ 199_raw</span><span class="col-type">INTEGER</span></div>
+              <div class="erd-col-row"><span class="col-key --">--</span><span class="col-name">ml_probability</span><span class="col-type">FLOAT</span></div>
+              <div class="erd-col-row"><span class="col-key --">--</span><span class="col-name">final_level</span><span class="col-type">VARCHAR</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="box" style="flex:1;">
+        <div class="box-head" style="color:#8b949e;border-top:3px solid #30363d;">📝 관계 설명</div>
+        <div class="box-body" style="display:flex;flex-direction:column;gap:0;">
+          <div class="note-item">
+            <span class="note-icon">🔵</span>
+            <span class="note-text"><b>disks (부모)</b> — 디스크 1개당 1행만 유지합니다. serial이 PK이며, 재진단 시 해당 행을 덮어씁니다. 대시보드의 전체 현황 표시에 사용됩니다.</span>
+          </div>
+          <div class="note-item">
+            <span class="note-icon">🟢</span>
+            <span class="note-text"><b>diagnosis_log (자식)</b> — 진단 요청마다 새 행이 추가됩니다. 같은 serial을 가진 디스크를 여러 번 진단하면 이력이 계속 쌓입니다.</span>
+          </div>
+          <div class="note-item">
+            <span class="note-icon">🔗</span>
+            <span class="note-text"><b>참조 방식</b> — SQLAlchemy 모델에 명시적 ForeignKey 선언은 없습니다. 쿼리 시 <code style="background:#1c2128;padding:1px 5px;border-radius:3px;font-size:11px;color:#79c0ff;">serial</code> 필터 조건으로 두 테이블을 연결합니다.</span>
+          </div>
+          <div class="note-item">
+            <span class="note-icon">⚡</span>
+            <span class="note-text"><b>진단 1회 = INSERT + UPSERT</b> — 진단 시 <code style="background:#1c2128;padding:1px 5px;border-radius:3px;font-size:11px;color:#79c0ff;">diagnosis_log</code>에 INSERT하고, <code style="background:#1c2128;padding:1px 5px;border-radius:3px;font-size:11px;color:#79c0ff;">disks</code>는 serial 기준으로 UPSERT합니다.</span>
+          </div>
+          <div class="note-item">
+            <span class="note-icon">🚫</span>
+            <span class="note-text"><b>MANUAL 제외</b> — serial = <code style="background:#1c2128;padding:1px 5px;border-radius:3px;font-size:11px;color:#ce9178;">"MANUAL"</code>인 수동 진단은 DB에 저장하지 않습니다. 예측 결과만 반환합니다.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ S3 diagnosis_log ══ -->
+  <div id="S3" class="scene">
+    <div class="table-desc-bar">
+      <b>diagnosis_log</b> — 진단 API 호출 시 SMART 수치와 ML/규칙 예측 결과를 매번 누적 저장합니다.
+      serial = <code style="background:#161b22;padding:1px 6px;border-radius:3px;font-size:11px;color:#ce9178;">"MANUAL"</code>인 수동 진단은 저장하지 않습니다.
+    </div>
+    <div class="box" style="flex:1;">
+      <div class="box-head" style="color:#3fb950;border-top:3px solid #388e3c;">🟢 diagnosis_log 컬럼 정의</div>
+      <div class="box-body" style="padding:0;">
+        <table class="col-table">
+          <thead>
+            <tr>
+              <th>컬럼명</th><th>타입</th><th>키</th><th>NULL</th><th>기본값</th><th>설명</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">id</td>
+              <td class="td-type">INTEGER</td>
+              <td><span class="pill pill-pk">PK</span></td>
+              <td class="td-null">NOT NULL</td>
+              <td class="td-default">auto</td>
+              <td class="td-desc">진단 로그 고유 식별자 (자동 증가)</td>
+            </tr>
+            <tr>
+              <td class="td-name">timestamp</td>
+              <td class="td-type">DATETIME</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">datetime.now</td>
+              <td class="td-desc">진단 수행 일시</td>
+            </tr>
+            <tr>
+              <td class="td-name">serial</td>
+              <td class="td-type">VARCHAR</td>
+              <td><span class="pill pill-fk">FK</span></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc">디스크 고유 시리얼 (disks.serial 참조)</td>
+            </tr>
+            <tr>
+              <td class="td-name">device</td>
+              <td class="td-type">VARCHAR</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc">디스크 연결 경로 (/dev/sda 등)</td>
+            </tr>
+            <tr>
+              <td class="td-name">model</td>
+              <td class="td-type">VARCHAR</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc">디스크 모델명</td>
+            </tr>
+            <tr>
+              <td class="td-name">capacity_bytes</td>
+              <td class="td-type">BIGINT</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc">디스크 용량 (bytes)</td>
+            </tr>
+            <tr>
+              <td class="td-name">smart_5_raw</td>
+              <td class="td-type">INTEGER</td>
+              <td><span class="pill pill-smart">SMART</span></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">0</td>
+              <td class="td-desc">재할당 섹터 수</td>
+            </tr>
+            <tr>
+              <td class="td-name">smart_9_raw</td>
+              <td class="td-type">INTEGER</td>
+              <td><span class="pill pill-smart">SMART</span></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">0</td>
+              <td class="td-desc">사용 누적 시간 (hours)</td>
+            </tr>
+            <tr>
+              <td class="td-name">smart_187_raw</td>
+              <td class="td-type">INTEGER</td>
+              <td><span class="pill pill-smart">SMART</span></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">0</td>
+              <td class="td-desc">수정 불가 오류 수</td>
+            </tr>
+            <tr>
+              <td class="td-name">smart_188_raw</td>
+              <td class="td-type">INTEGER</td>
+              <td><span class="pill pill-smart">SMART</span></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">0</td>
+              <td class="td-desc">명령 타임아웃 수</td>
+            </tr>
+            <tr>
+              <td class="td-name">smart_194_raw</td>
+              <td class="td-type">INTEGER</td>
+              <td><span class="pill pill-smart">SMART</span></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">0</td>
+              <td class="td-desc">디스크 온도 (℃)</td>
+            </tr>
+            <tr>
+              <td class="td-name">smart_197_raw</td>
+              <td class="td-type">INTEGER</td>
+              <td><span class="pill pill-smart">SMART</span></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">0</td>
+              <td class="td-desc">대기(불안정) 섹터 수</td>
+            </tr>
+            <tr>
+              <td class="td-name">smart_198_raw</td>
+              <td class="td-type">INTEGER</td>
+              <td><span class="pill pill-smart">SMART</span></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">0</td>
+              <td class="td-desc">정정 불가 섹터 수</td>
+            </tr>
+            <tr>
+              <td class="td-name">smart_199_raw</td>
+              <td class="td-type">INTEGER</td>
+              <td><span class="pill pill-smart">SMART</span></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">0</td>
+              <td class="td-desc">UltraDMA CRC 오류 수</td>
+            </tr>
+            <tr>
+              <td class="td-name">ml_probability</td>
+              <td class="td-type">FLOAT</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc">ML 모델 고장 확률 (0.0 ~ 1.0)</td>
+            </tr>
+            <tr>
+              <td class="td-name">ml_level</td>
+              <td class="td-type">VARCHAR</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc">ML 판정 등급 (정상 / 주의 / 위험)</td>
+            </tr>
+            <tr>
+              <td class="td-name">rule_level</td>
+              <td class="td-type">VARCHAR</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc">규칙 기반 판정 등급 (정상 / 주의 / 위험)</td>
+            </tr>
+            <tr>
+              <td class="td-name">final_level</td>
+              <td class="td-type">VARCHAR</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc"><b>최종 판정 등급</b> — ML과 규칙 중 높은 등급 채택</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ S4 disks ══ -->
+  <div id="S4" class="scene">
+    <div class="table-desc-bar">
+      <b>disks</b> — 디스크별 최신 상태만 1건 유지합니다. 진단 시 serial 기준으로 UPSERT되며, 대시보드에서 전체 현황을 조회하는 데 사용됩니다.
+    </div>
+    <div class="box" style="flex:1;">
+      <div class="box-head" style="color:#58a6ff;border-top:3px solid #1f6feb;">🔵 disks 컬럼 정의</div>
+      <div class="box-body" style="padding:0;">
+        <table class="col-table">
+          <thead>
+            <tr>
+              <th>컬럼명</th><th>타입</th><th>키</th><th>NULL</th><th>기본값</th><th>설명</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">serial</td>
+              <td class="td-type">VARCHAR</td>
+              <td><span class="pill pill-pk">PK</span></td>
+              <td class="td-null">NOT NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc">디스크 고유 시리얼 넘버 (기본키)</td>
+            </tr>
+            <tr>
+              <td class="td-name">device</td>
+              <td class="td-type">VARCHAR</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc">현재 연결 경로 (/dev/sda 등) 참고용</td>
+            </tr>
+            <tr>
+              <td class="td-name">model</td>
+              <td class="td-type">VARCHAR</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc">디스크 모델명</td>
+            </tr>
+            <tr>
+              <td class="td-name">capacity_bytes</td>
+              <td class="td-type">BIGINT</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc">디스크 용량 (bytes)</td>
+            </tr>
+            <tr>
+              <td class="td-name">final_level</td>
+              <td class="td-type">VARCHAR</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc">최신 최종 판정 등급 (정상 / 주의 / 위험)</td>
+            </tr>
+            <tr>
+              <td class="td-name">risk</td>
+              <td class="td-type">FLOAT</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">-</td>
+              <td class="td-desc">위험도 수치 (0.0 ~ 100.0, ML 확률 × 100)</td>
+            </tr>
+            <tr>
+              <td class="td-name">action_status</td>
+              <td class="td-type">VARCHAR</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">미확인</td>
+              <td class="td-desc">조치 상태 — <b>미확인</b> / 확인됨 / 조치완료</td>
+            </tr>
+            <tr>
+              <td class="td-name">last_updated</td>
+              <td class="td-type">DATETIME</td>
+              <td></td>
+              <td class="td-null">NULL</td>
+              <td class="td-default">datetime.now</td>
+              <td class="td-desc">마지막 상태 업데이트 일시</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ S5 판정 등급 ══ -->
+  <div id="S5" class="scene">
+    <div class="grade-wrap">
+
+      <div class="box">
+        <div class="box-head" style="color:#58a6ff;border-top:3px solid #1f6feb;">🤖 ML 기반 등급 (ml_level)</div>
+        <div class="box-body" style="padding:0;">
+          <table class="grade-table">
+            <thead><tr><th>등급</th><th>ML 확률 범위</th><th>의미</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="level-badge level-정상">정상</span></td>
+                <td class="grade-range">prob &lt; 0.36</td>
+                <td class="grade-cond">고장 가능성 낮음</td>
+              </tr>
+              <tr>
+                <td><span class="level-badge level-주의">주의</span></td>
+                <td class="grade-range">0.36 ≤ prob &lt; 0.70</td>
+                <td class="grade-cond">고장 가능성 중간, 모니터링 필요</td>
+              </tr>
+              <tr>
+                <td><span class="level-badge level-위험">위험</span></td>
+                <td class="grade-range">prob ≥ 0.70</td>
+                <td class="grade-cond">고장 가능성 높음, 즉각 조치 필요</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-head" style="color:#d29922;border-top:3px solid #d29922;">📏 규칙 기반 등급 (rule_level)</div>
+        <div class="box-body" style="padding:0;">
+          <table class="grade-table">
+            <thead><tr><th>등급</th><th>SMART 조건</th><th>비고</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="level-badge level-위험">위험</span></td>
+                <td class="grade-range" style="font-size:11px;">smart_197 &gt; 0 또는 smart_198 &gt; 0</td>
+                <td class="grade-note">대기/정정불가 섹터 존재</td>
+              </tr>
+              <tr>
+                <td><span class="level-badge level-위험">위험</span></td>
+                <td class="grade-range" style="font-size:11px;">smart_5 ≥ 100</td>
+                <td class="grade-note">재할당 섹터 매우 많음</td>
+              </tr>
+              <tr>
+                <td><span class="level-badge level-위험">위험</span></td>
+                <td class="grade-range" style="font-size:11px;">smart_187 &gt; 0</td>
+                <td class="grade-note">수정 불가 오류 발생</td>
+              </tr>
+              <tr>
+                <td><span class="level-badge level-주의">주의</span></td>
+                <td class="grade-range" style="font-size:11px;">smart_5 &gt; 0 또는 smart_188/199 &gt; 0</td>
+                <td class="grade-note">경미한 이상 감지</td>
+              </tr>
+              <tr>
+                <td><span class="level-badge level-주의">주의</span></td>
+                <td class="grade-range" style="font-size:11px;">smart_194 ≥ 50</td>
+                <td class="grade-note">온도 과열 (50℃ 이상)</td>
+              </tr>
+              <tr>
+                <td><span class="level-badge level-정상">정상</span></td>
+                <td class="grade-range" style="font-size:11px;">위 조건 해당 없음</td>
+                <td class="grade-note">이상 없음</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="final-note">
+      ⚡ <b>최종 등급(final_level)</b>은 ml_level과 rule_level 중 더 높은 등급을 채택합니다. &nbsp;
+      <b>정상 &lt; 주의 &lt; 위험</b> &nbsp;—&nbsp; ML 확률이 낮더라도 위험 SMART 지표가 감지되면 위험으로 판정합니다.
+    </div>
+
+    <div class="box" style="flex:1;">
+      <div class="box-head" style="color:#8b949e;border-top:3px solid #30363d;">🏷️ 조치 상태 코드 (action_status)</div>
+      <div class="box-body">
+        <div class="action-row">
+          <div class="action-card 미확인">
+            <div class="action-label">미확인</div>
+            <div class="action-desc">진단 후 아직 확인하지 않은 상태<br><b>기본값</b>으로 설정됩니다.</div>
+          </div>
+          <div class="action-card 확인됨">
+            <div class="action-label">확인됨</div>
+            <div class="action-desc">담당자가 이상 상태를<br>인지하고 확인한 상태입니다.</div>
+          </div>
+          <div class="action-card 조치완료">
+            <div class="action-label">조치완료</div>
+            <div class="action-desc">디스크 교체 또는 조치가<br>완료된 상태입니다.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+</body>
+</html>
