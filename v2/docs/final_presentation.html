@@ -134,11 +134,26 @@
       letter-spacing: 0;
     }
 
+    .toc-slide {
+      padding-top: 22px;
+      padding-bottom: 18px;
+    }
+
+    .toc-slide .slide-titlebar {
+      margin-bottom: 10px;
+    }
+
+    .toc-slide .slide-title {
+      font-size: 42px;
+      line-height: 1.02;
+    }
+
     .toc-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
-      margin-top: 8px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 20px;
+      margin-top: 0;
+      max-width: 1280px;
     }
 
     .toc-item,
@@ -154,30 +169,31 @@
     }
 
     .toc-item {
-      min-height: 92px;
+      min-height: 48px;
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 12px;
+      padding: 9px 16px;
     }
 
     .toc-no {
-      width: 54px;
-      height: 54px;
-      border-radius: 14px;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
       display: grid;
       place-items: center;
       background: rgba(77, 163, 255, 0.14);
       color: var(--blue);
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 900;
       border: 1px solid rgba(77, 163, 255, 0.34);
       flex: 0 0 auto;
     }
 
     .toc-name {
-      font-size: 22px;
+      font-size: 18px;
       font-weight: 850;
-      line-height: 1.35;
+      line-height: 1.18;
     }
 
     .overview-grid {
@@ -353,7 +369,7 @@
     }
 
     .note-card {
-      min-height: 355px;
+      min-height: 426px;
       border-style: dashed;
     }
 
@@ -367,15 +383,16 @@
 
     .note-area {
       margin-top: 16px;
-      height: 230px;
+      height: 276px;
       border-radius: 10px;
       border: 1px solid var(--line);
       background: rgba(4, 8, 13, 0.62);
       padding: 18px;
       color: var(--muted);
-      font-size: 16px;
-      line-height: 1.7;
+      font-size: 15px;
+      line-height: 1.58;
       white-space: pre-line;
+      overflow: hidden;
     }
 
     .bottom-note {
@@ -464,33 +481,33 @@
       </div>
     </section>
 
-    <section class="slide" data-title="목차">
+    <section class="slide toc-slide" data-title="목차">
       <div class="slide-titlebar">
-        <div class="slide-kicker">01 Contents</div>
+        <div class="slide-kicker">Contents</div>
         <h2 class="slide-title">목차</h2>
       </div>
       <div class="content">
         <div class="toc-grid">
-          <div class="toc-item"><div class="toc-no">01</div><div class="toc-name">목차</div></div>
-          <div class="toc-item"><div class="toc-no">02</div><div class="toc-name">프로젝트 개요</div></div>
-          <div class="toc-item"><div class="toc-no">03</div><div class="toc-name">팀원 소개</div></div>
-          <div class="toc-item"><div class="toc-no">04</div><div class="toc-name">기술 스택</div></div>
-          <div class="toc-item"><div class="toc-no">05</div><div class="toc-name">WBS</div></div>
-          <div class="toc-item"><div class="toc-no">06</div><div class="toc-name">요구사항 명세서</div></div>
-          <div class="toc-item"><div class="toc-no">07</div><div class="toc-name">메뉴 트리 / 사용자 시나리오</div></div>
-          <div class="toc-item"><div class="toc-no">08</div><div class="toc-name">와이어프레임</div></div>
-          <div class="toc-item"><div class="toc-no">09</div><div class="toc-name">스토리보드</div></div>
-          <div class="toc-item"><div class="toc-no">10</div><div class="toc-name">테이블 정의서 / ERD</div></div>
-          <div class="toc-item"><div class="toc-no">11</div><div class="toc-name">테스트 케이스</div></div>
-          <div class="toc-item"><div class="toc-no">12</div><div class="toc-name">트러블 슈팅 및 회고</div></div>
-          <div class="toc-item"><div class="toc-no">13</div><div class="toc-name">느낀점</div></div>
+          <div class="toc-item"><div class="toc-no">01</div><div class="toc-name">프로젝트 개요</div></div>
+          <div class="toc-item"><div class="toc-no">02</div><div class="toc-name">팀원 소개</div></div>
+          <div class="toc-item"><div class="toc-no">03</div><div class="toc-name">기술 스택</div></div>
+          <div class="toc-item"><div class="toc-no">04</div><div class="toc-name">WBS</div></div>
+          <div class="toc-item"><div class="toc-no">05</div><div class="toc-name">요구사항 명세서</div></div>
+          <div class="toc-item"><div class="toc-no">06</div><div class="toc-name">메뉴 트리 / 사용자 시나리오</div></div>
+          <div class="toc-item"><div class="toc-no">07</div><div class="toc-name">와이어프레임</div></div>
+          <div class="toc-item"><div class="toc-no">08</div><div class="toc-name">스토리보드</div></div>
+          <div class="toc-item"><div class="toc-no">09</div><div class="toc-name">테이블 정의서 / ERD</div></div>
+          <div class="toc-item"><div class="toc-no">10</div><div class="toc-name">테스트 케이스</div></div>
+          <div class="toc-item"><div class="toc-no">11</div><div class="toc-name">트러블 슈팅 및 회고</div></div>
+          <div class="toc-item"><div class="toc-no">12</div><div class="toc-name">느낀점</div></div>
+          <div class="toc-item"><div class="toc-no">13</div><div class="toc-name">향후 계획</div></div>
         </div>
       </div>
     </section>
 
     <section class="slide" data-title="프로젝트 개요">
       <div class="slide-titlebar">
-        <div class="slide-kicker">02 Project Overview</div>
+        <div class="slide-kicker">01 Project Overview</div>
         <h2 class="slide-title">프로젝트 개요</h2>
         <p class="slide-desc">HPDFS는 클라이언트 PC의 저장장치 SMART 데이터를 수집하고, 머신러닝 모델과 규칙 기반 보정을 결합해 고장 위험도를 진단하는 시스템입니다.</p>
       </div>
@@ -528,7 +545,7 @@
 
     <section class="slide" data-title="팀원 소개">
       <div class="slide-titlebar">
-        <div class="slide-kicker">03 Team</div>
+        <div class="slide-kicker">02 Team</div>
         <h2 class="slide-title">팀원 소개</h2>
         <p class="slide-desc">기획, 데이터/모델, 백엔드, 프론트엔드, 인프라, 테스트 영역을 나누어 짧은 기간 안에 기능 구현과 발표 자료를 병행했습니다.</p>
       </div>
@@ -575,7 +592,7 @@
 
     <section class="slide" data-title="기술 스택">
       <div class="slide-titlebar">
-        <div class="slide-kicker">04 Tech Stack</div>
+        <div class="slide-kicker">03 Tech Stack</div>
         <h2 class="slide-title">기술 스택</h2>
         <p class="slide-desc">로컬 수집 Agent와 서버형 진단 대시보드를 분리하고, Docker 기반으로 실행 환경을 통합했습니다.</p>
       </div>
@@ -596,7 +613,7 @@
               <li><b>FastAPI</b></li>
               <li><b>scikit-learn</b></li>
               <li><b>pandas / joblib</b></li>
-              <li>GradientBoosting 모델 로딩</li>
+              <li>RandomForest 모델 로딩</li>
             </ul>
           </div>
           <div class="stack-card accent-amber">
@@ -623,7 +640,7 @@
 
     <section class="slide" data-title="WBS">
       <div class="slide-titlebar">
-        <div class="slide-kicker">05 WBS</div>
+        <div class="slide-kicker">04 WBS</div>
         <h2 class="slide-title">WBS</h2>
       </div>
       <div class="frame-shell"><iframe src="wbs.html"></iframe></div>
@@ -631,7 +648,7 @@
 
     <section class="slide" data-title="요구사항 명세서">
       <div class="slide-titlebar">
-        <div class="slide-kicker">06 Requirements</div>
+        <div class="slide-kicker">05 Requirements</div>
         <h2 class="slide-title">요구사항 명세서</h2>
       </div>
       <div class="frame-shell"><iframe src="requirements.html"></iframe></div>
@@ -639,7 +656,7 @@
 
     <section class="slide" data-title="메뉴 트리 / 사용자 시나리오">
       <div class="slide-titlebar">
-        <div class="slide-kicker">07 Menu / Scenario</div>
+        <div class="slide-kicker">06 Menu / Scenario</div>
         <h2 class="slide-title">메뉴 트리 / 사용자 시나리오</h2>
       </div>
       <div class="frame-shell"><iframe src="menu_scenario.html"></iframe></div>
@@ -647,7 +664,7 @@
 
     <section class="slide" data-title="와이어프레임">
       <div class="slide-titlebar">
-        <div class="slide-kicker">08 Wireframe</div>
+        <div class="slide-kicker">07 Wireframe</div>
         <h2 class="slide-title">와이어프레임</h2>
       </div>
       <div class="content">
@@ -666,7 +683,7 @@
 
     <section class="slide" data-title="스토리보드">
       <div class="slide-titlebar">
-        <div class="slide-kicker">09 Storyboard</div>
+        <div class="slide-kicker">08 Storyboard</div>
         <h2 class="slide-title">스토리보드</h2>
       </div>
       <div class="frame-shell"><iframe src="storyboard.html"></iframe></div>
@@ -674,7 +691,7 @@
 
     <section class="slide" data-title="테이블 정의서 / ERD">
       <div class="slide-titlebar">
-        <div class="slide-kicker">10 Table / ERD</div>
+        <div class="slide-kicker">09 Table / ERD</div>
         <h2 class="slide-title">테이블 정의서 / ERD</h2>
       </div>
       <div class="frame-shell"><iframe src="table_definition.html"></iframe></div>
@@ -682,7 +699,7 @@
 
     <section class="slide" data-title="테스트 케이스">
       <div class="slide-titlebar">
-        <div class="slide-kicker">11 Test Cases</div>
+        <div class="slide-kicker">10 Test Cases</div>
         <h2 class="slide-title">테스트 케이스</h2>
       </div>
       <div class="frame-shell"><iframe src="test_cases.html"></iframe></div>
@@ -690,7 +707,7 @@
 
     <section class="slide" data-title="트러블 슈팅 및 회고">
       <div class="slide-titlebar">
-        <div class="slide-kicker">12 Troubleshooting</div>
+        <div class="slide-kicker">11 Troubleshooting</div>
         <h2 class="slide-title">트러블 슈팅 및 회고</h2>
       </div>
       <div class="frame-shell"><iframe src="troubleshooting.html"></iframe></div>
@@ -698,7 +715,7 @@
 
     <section class="slide" data-title="느낀점">
       <div class="slide-titlebar">
-        <div class="slide-kicker">13 Retrospective</div>
+        <div class="slide-kicker">12 Retrospective</div>
         <h2 class="slide-title">느낀점</h2>
         <p class="slide-desc">팀원별 최종 회고를 채워 넣는 페이지입니다. 각자 프로젝트를 진행하며 느낀 점을 중심으로 작성합니다.</p>
       </div>
@@ -710,19 +727,63 @@
           </div>
           <div class="note-card">
             <h3>홍제규 <span class="role">Backend / DB</span></h3>
-            <div class="note-area">느낀점:</div>
+            <div class="note-area">기계학습 모델의 성능은 알고리즘 선택도 중요하지만, 데이터 이해와 전처리 과정에 크게 좌우된다는 점을 배웠습니다. 다양한 특징(feature) 중 고장 예측에 유의미한 정보를 분석하며, 특성 선택과 데이터 이해의 중요성을 배울 수 있었습니다.</div>
           </div>
           <div class="note-card">
             <h3>장영재 <span class="role">Frontend</span></h3>
-            <div class="note-area">느낀점:</div>
+            <div class="note-area">프론트엔드를 담당하며 저장장치 상태와 AI 예측 결과를 한눈에 확인할 수 있는 대시보드를 구현했습니다. API 연동을 통해 데이터 흐름을 이해했고, 사용자 관점에서 정보를 시각화하는 방법과 협업의 중요성을 배울 수 있었습니다.</div>
           </div>
           <div class="note-card">
             <h3>안세웅 <span class="role">Infra / Agent</span></h3>
-            <div class="note-area">느낀점:</div>
+            <div class="note-area">Docker Compose로 Backend, Frontend, DB, Nginx를 단일 환경으로 묶어 팀원 간 환경 차이를 줄일 수 있었습니다. smartctl 바이너리를 레포에 포함한 결정도 도움이 되었고, 컨테이너 기반 배포가 협업 생산성에 왜 중요한지 체감할 수 있었습니다.</div>
           </div>
           <div class="note-card">
             <h3>이성룡 <span class="role">Backend / DB</span></h3>
-            <div class="note-area">느낀점:</div>
+            <div class="note-area">JS, Spring Boot가 아닌 다른 기술로 프로젝트를 구현하게 되어 많은 어려움이 있었지만, FastAPI, PostgreSQL, Docker Compose 등의 새로운 지식을 습득하며 한 단계 더 성장할 수 있는 시간이었습니다.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="향후 계획">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">13 Future Plan</div>
+        <h2 class="slide-title">향후 계획</h2>
+        <p class="slide-desc">현재 구현된 로컬 Agent 기반 진단 흐름을 바탕으로, 수집 안정성, 예측 성능, 운영 기능을 단계적으로 확장할 계획입니다.</p>
+      </div>
+      <div class="content">
+        <div class="stack-grid">
+          <div class="stack-card accent-blue">
+            <h3>수집 안정성 개선</h3>
+            <ul>
+              <li>NVMe, SATA 등 장치 유형별 예외 처리 강화</li>
+              <li>SMART 미지원 장치에 대한 안내 메시지 개선</li>
+              <li>Agent 실행 상태와 전송 실패 로그 가시화</li>
+            </ul>
+          </div>
+          <div class="stack-card accent-green">
+            <h3>모델 고도화</h3>
+            <ul>
+              <li>Backblaze 데이터 추가 반영 및 재학습</li>
+              <li>실제 고장 탐지율 개선을 위한 임계값 보정</li>
+              <li>모델별 성능 비교와 버전 관리 체계화</li>
+            </ul>
+          </div>
+          <div class="stack-card accent-amber">
+            <h3>대시보드 확장</h3>
+            <ul>
+              <li>디스크별 위험도 추이 그래프 추가</li>
+              <li>진단 이력 검색 및 필터 기능 보강</li>
+              <li>위험 원인과 권장 조치 설명 개선</li>
+            </ul>
+          </div>
+          <div class="stack-card accent-danger">
+            <h3>운영 환경 확장</h3>
+            <ul>
+              <li>Kubernetes 기반 클라우드 배포 검증</li>
+              <li>알림 기능과 사용자 인증 기능 추가</li>
+              <li>다수 PC 진단 결과를 중앙에서 관리</li>
+            </ul>
           </div>
         </div>
       </div>
