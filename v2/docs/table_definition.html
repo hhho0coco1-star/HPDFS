@@ -89,7 +89,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  width: 100%; max-width: 1000px;
+  width: 100%; max-width: 1120px;
 }
 .desc-text {
   font-size: 13.5px; color: #8b949e; line-height: 1.9;
@@ -129,11 +129,11 @@ body {
 .erd-wrap {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 14px; min-height: 0; padding: 10px 0;
+  gap: 8px; min-height: 0; padding: 4px 0;
 }
 .erd-center-row {
   display: flex; align-items: center; gap: 0;
-  width: 100%; max-width: 1000px;
+  width: 100%; max-width: 1120px;
 }
 .erd-table-box {
   flex: 1; border-radius: 12px; overflow: hidden; border: 2px solid;
@@ -142,21 +142,21 @@ body {
 .erd-table-box.disks-box { border-color: #1f6feb; }
 .erd-table-box.log-box   { border-color: #388e3c; }
 .erd-table-head {
-  padding: 14px 22px;
-  font-size: 15px; font-weight: 800;
+  padding: 10px 18px;
+  font-size: 14px; font-weight: 800;
   display: flex; align-items: center; gap: 10px;
   border-bottom: 1px solid rgba(255,255,255,.07);
 }
 .disks-box .erd-table-head { background: #0d1825; color: #58a6ff; }
 .log-box   .erd-table-head { background: #0d2318; color: #3fb950; }
 .erd-table-head .tname {
-  font-family: "Consolas", monospace; font-size: 17px; font-weight: 900;
+  font-family: "Consolas", monospace; font-size: 16px; font-weight: 900;
 }
 .erd-table-head .tko { font-size: 12px; opacity: .6; }
 .erd-table-cols { background: #161b22; }
 .erd-col-row {
   display: flex; align-items: center;
-  padding: 11px 22px; gap: 14px;
+  padding: 7px 18px; gap: 12px;
   border-bottom: 1px solid #1c2128;
 }
 .erd-col-row:last-child { border-bottom: none; }
@@ -175,12 +175,12 @@ body {
 .erd-connector {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  flex: 0 0 130px; gap: 6px;
+  flex: 0 0 112px; gap: 5px;
 }
 .conn-line-h { width: 100%; height: 2px; background: #30363d; }
 .conn-badge {
   font-size: 15px; font-weight: 900;
-  padding: 8px 18px; border-radius: 20px;
+  padding: 6px 16px; border-radius: 18px;
   background: #1c2128; color: #d29922;
   border: 2px solid #d29922; white-space: nowrap;
 }
@@ -191,21 +191,21 @@ body {
 /* 하단 노트 */
 .erd-note-row {
   display: flex; gap: 10px;
-  width: 100%; max-width: 1000px;
+  width: 100%; max-width: 1120px;
 }
 .erd-note-card {
   flex: 1; background: #161b22; border: 1px solid #30363d;
-  border-radius: 10px; padding: 12px 16px;
-  display: flex; align-items: flex-start; gap: 10px;
+  border-radius: 8px; padding: 8px 10px;
+  display: flex; align-items: flex-start; gap: 8px;
 }
-.erd-note-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.erd-note-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
 .erd-note-body {}
-.erd-note-title { font-size: 12px; font-weight: 800; color: #c9d1d9; margin-bottom: 3px; }
-.erd-note-desc { font-size: 11.5px; color: #8b949e; line-height: 1.65; }
+.erd-note-title { font-size: 11.3px; font-weight: 800; color: #c9d1d9; margin-bottom: 2px; }
+.erd-note-desc { font-size: 10.4px; color: #8b949e; line-height: 1.38; }
 .erd-note-desc b { color: #c9d1d9; }
 .erd-note-desc code {
   background: #1c2128; padding: 1px 5px; border-radius: 3px;
-  font-size: 10.5px; color: #79c0ff; font-family: "Consolas", monospace;
+  font-size: 9.6px; color: #79c0ff; font-family: "Consolas", monospace;
 }
 .erd-note-desc code.red { color: #ce9178; }
 
@@ -213,7 +213,7 @@ body {
 .col-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 11.4px;
 }
 .col-table th {
   padding: 8px 10px;
@@ -225,7 +225,7 @@ body {
   white-space: nowrap;
 }
 .col-table td {
-  padding: 8px 10px;
+  padding: 5px 8px;
   border-bottom: 1px solid #1c2128;
   vertical-align: middle;
 }
@@ -273,16 +273,16 @@ body {
 .grade-wrap {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 9px;
+  gap: 7px;
   flex: 0 0 auto;
 }
 .grade-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 11.4px;
 }
 .grade-table th {
-  padding: 7px 10px;
+  padding: 5px 8px;
   text-align: left;
   font-size: 10.5px; font-weight: 700;
   color: #8b949e; text-transform: uppercase;
@@ -290,7 +290,7 @@ body {
   background: #0d1117;
 }
 .grade-table td {
-  padding: 8px 10px;
+  padding: 5px 8px;
   border-bottom: 1px solid #1c2128;
   vertical-align: middle;
 }
@@ -308,33 +308,33 @@ body {
   font-family: "Consolas", monospace;
   font-size: 11.5px; color: #79c0ff;
 }
-.grade-cond { font-size: 12px; color: #8b949e; line-height: 1.6; }
-.grade-note { font-size: 11px; color: #6e7681; }
+.grade-cond { font-size: 11.2px; color: #8b949e; line-height: 1.35; }
+.grade-note { font-size: 10.5px; color: #6e7681; }
 
 .action-wrap { flex: 1; min-height: 0; }
 .action-row {
-  display: flex; gap: 9px;
+  display: flex; gap: 7px;
 }
 .action-card {
-  flex: 1; border-radius: 8px; padding: 14px 16px;
+  flex: 1; border-radius: 8px; padding: 8px 12px;
   border: 1px solid;
-  display: flex; flex-direction: column; gap: 6px;
+  display: flex; flex-direction: column; gap: 3px;
 }
 .action-card.미확인 { background: #0d1117; border-color: #30363d; }
 .action-card.확인됨 { background: #0d1825; border-color: #1f4080; }
 .action-card.조치완료 { background: #0d2318; border-color: #1a4a2a; }
 .action-label {
-  font-size: 13px; font-weight: 800;
+  font-size: 12px; font-weight: 800;
 }
 .미확인 .action-label { color: #8b949e; }
 .확인됨 .action-label { color: #58a6ff; }
 .조치완료 .action-label { color: #3fb950; }
-.action-desc { font-size: 12px; color: #6e7681; line-height: 1.6; }
+.action-desc { font-size: 11px; color: #6e7681; line-height: 1.35; }
 
 .final-note {
   background: #1c2128; border-left: 3px solid #d29922;
-  border-radius: 6px; padding: 10px 14px;
-  font-size: 12.5px; color: #8b949e; line-height: 1.7;
+  border-radius: 6px; padding: 7px 12px;
+  font-size: 11.5px; color: #8b949e; line-height: 1.45;
   flex-shrink: 0;
 }
 .final-note b { color: #f0a040; }
@@ -836,7 +836,7 @@ body {
       <b>정상 &lt; 주의 &lt; 위험</b> &nbsp;—&nbsp; ML 확률이 낮더라도 위험 SMART 지표가 감지되면 위험으로 판정합니다.
     </div>
 
-    <div class="box" style="flex:1;">
+    <div class="box" style="flex:0 0 auto;">
       <div class="box-head" style="color:#8b949e;border-top:3px solid #30363d;">🏷️ 조치 상태 코드 (action_status)</div>
       <div class="box-body">
         <div class="action-row">
