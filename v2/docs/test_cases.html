@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HPDFS 테스트 케이스</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#0d1117; height:100vh; overflow:hidden; }
+.wrap { display:flex; flex-direction:column; height:100vh; padding:12px 18px; gap:10px; }
+
+/* ── 헤더 ── */
+.head { display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.title { font-size:17px; font-weight:900; color:#e6edf3; }
+.subtitle { font-size:11px; color:#8b949e; margin-top:2px; }
+.nav { display:flex; gap:5px; }
+.nav-btn { font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; border:1.5px solid #30363d; background:#161b22; color:#8b949e; cursor:pointer; transition:all .15s; }
+.nav-btn:hover { border-color:#58a6ff; color:#58a6ff; }
+.nav-btn.active { background:#1f6feb; color:#fff; border-color:#1f6feb; }
+
+/* ── 장면 ── */
+.scene { display:none; flex:1; min-height:0; flex-direction:column; gap:8px; }
+.scene.active { display:flex; }
+
+/* ══ S1 시각화 ══ */
+.stat-row { display:flex; gap:8px; flex-shrink:0; }
+.stat-card {
+  flex:1; background:#161b22; border:1px solid #30363d; border-radius:10px;
+  padding:12px 16px; display:flex; flex-direction:column; gap:4px;
+}
+.stat-label { font-size:10px; font-weight:800; color:#6e7681; text-transform:uppercase; letter-spacing:.4px; }
+.stat-val { font-size:26px; font-weight:900; line-height:1; }
+.stat-desc { font-size:10.5px; color:#6e7681; margin-top:2px; }
+
+.chart-grid {
+  flex:1; min-height:0;
+  display:grid; grid-template-columns:1fr 1.6fr;
+  grid-template-rows:1fr 1fr; gap:8px;
+}
+.chart-card {
+  background:#161b22; border:1px solid #30363d; border-radius:10px;
+  padding:14px 16px; display:flex; flex-direction:column; gap:10px; overflow:hidden;
+}
+.chart-title { font-size:10px; font-weight:800; color:#6e7681; text-transform:uppercase; letter-spacing:.4px; flex-shrink:0; }
+
+/* 도넛 차트 */
+.donut-area { flex:1; display:flex; align-items:center; justify-content:center; gap:24px; }
+.donut-wrap { position:relative; width:150px; height:150px; flex-shrink:0; }
+.donut-svg { width:150px; height:150px; transform:rotate(-90deg); }
+.donut-track { fill:none; stroke:#21262d; stroke-width:22; }
+.donut-fill  { fill:none; stroke:#3fb950; stroke-width:22; stroke-linecap:round;
+  stroke-dasharray:408; stroke-dashoffset:0; transition:stroke-dashoffset 1s ease; }
+.donut-center {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+}
+.donut-pct { font-size:28px; font-weight:900; color:#3fb950; line-height:1; }
+.donut-sub { font-size:10px; color:#6e7681; margin-top:2px; }
+.donut-legend { display:flex; flex-direction:column; gap:8px; }
+.legend-item { display:flex; align-items:center; gap:8px; font-size:11px; }
+.legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.legend-key { color:#8b949e; }
+.legend-cnt { font-weight:700; color:#c9d1d9; margin-left:auto; }
+
+/* 수평 바 차트 */
+.hbar-list { flex:1; display:flex; flex-direction:column; justify-content:space-evenly; min-height:0; }
+.hbar-row { display:flex; align-items:center; gap:8px; }
+.hbar-label { font-size:10.5px; color:#8b949e; flex-shrink:0; text-align:right; width:88px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.hbar-track { flex:1; height:18px; background:#0d1117; border-radius:9px; overflow:hidden; position:relative; }
+.hbar-fill { height:100%; border-radius:9px; display:flex; align-items:center; padding-left:8px; font-size:9px; font-weight:700; color:rgba(255,255,255,.85); white-space:nowrap; min-width:24px; transition:width .8s ease; }
+.hbar-num { width:22px; font-size:10.5px; font-weight:700; color:#6e7681; text-align:right; flex-shrink:0; }
+
+/* 스택 바 (우선순위 분포) */
+.sbar-list { flex:1; display:flex; flex-direction:column; justify-content:space-evenly; min-height:0; }
+.sbar-row { display:flex; align-items:center; gap:8px; }
+.sbar-label { font-size:10px; color:#8b949e; flex-shrink:0; text-align:right; width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sbar-track { flex:1; height:18px; background:#0d1117; border-radius:9px; overflow:hidden; display:flex; }
+.sbar-seg { height:100%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:rgba(255,255,255,.8); transition:width .8s ease; }
+.sbar-total { width:24px; font-size:10px; color:#6e7681; text-align:right; flex-shrink:0; }
+.sbar-legend { display:flex; gap:12px; flex-shrink:0; }
+.sbar-leg-item { display:flex; align-items:center; gap:5px; font-size:10px; color:#6e7681; }
+.sbar-leg-dot { width:9px; height:9px; border-radius:3px; }
+
+/* 담당자 바 */
+.person-list { flex:1; display:flex; flex-direction:column; justify-content:space-evenly; min-height:0; }
+.person-row { display:flex; align-items:center; gap:8px; }
+.person-name { width:56px; font-size:10.5px; font-weight:700; flex-shrink:0; text-align:right; }
+.person-track { flex:1; height:18px; background:#0d1117; border-radius:9px; overflow:hidden; position:relative; }
+.person-bar { height:100%; border-radius:9px; display:flex; align-items:center; padding:0 8px; font-size:9px; font-weight:700; color:rgba(255,255,255,.8); transition:width .8s; }
+.person-cnt { width:22px; font-size:10.5px; font-weight:700; color:#6e7681; text-align:right; flex-shrink:0; }
+.person-cats { font-size:9px; color:#6e7681; margin-left:4px; }
+
+/* ══ S2 테이블 ══ */
+.tbl-wrap { flex:1; min-height:0; display:flex; flex-direction:column; background:#161b22; border-radius:10px; border:1px solid #30363d; overflow:hidden; }
+.tbl-filters { padding:8px 12px; background:#0d1117; border-bottom:1px solid #21262d; display:flex; gap:5px; flex-shrink:0; flex-wrap:wrap; align-items:center; }
+.filter-btn { font-size:10px; font-weight:700; padding:2px 10px; border-radius:10px; border:1.5px solid; cursor:pointer; background:transparent; opacity:.45; transition:opacity .15s; }
+.filter-btn:hover { opacity:.8; }
+.filter-btn.f-active { opacity:1; }
+.filter-btn.f-all { border-color:#30363d; color:#8b949e; }
+.filter-btn.f-all.f-active { background:#21262d; }
+.tbl-scroll { flex:1; overflow-y:auto; }
+.tbl-scroll::-webkit-scrollbar { width:3px; }
+.tbl-scroll::-webkit-scrollbar-thumb { background:#30363d; border-radius:2px; }
+
+.tc-table { width:100%; border-collapse:collapse; font-size:12px; table-layout:fixed; }
+.tc-table th { padding:8px 10px; text-align:left; font-size:10px; font-weight:800; letter-spacing:.4px; color:#6e7681; text-transform:uppercase; background:#0d1117; border-bottom:2px solid #21262d; white-space:nowrap; position:sticky; top:0; z-index:1; }
+.tc-table td { padding:9px 10px; border-bottom:1px solid #1c2128; color:#8b949e; vertical-align:top; overflow:hidden; }
+.tc-table tr:last-child td { border-bottom:none; }
+.tc-table tr:hover td { background:#1c2128; }
+
+.tc-id { font-family:"Consolas",monospace; font-size:10.5px; font-weight:700; }
+.cat-badge { display:inline-block; font-size:10px; font-weight:800; padding:2px 7px; border-radius:9px; border:1.5px solid; white-space:nowrap; }
+.tc-item { font-weight:600; color:#c9d1d9; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tc-sub { font-size:10.5px; color:#6e7681; margin-top:2px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.tc-expect { font-size:11px; color:#8b949e; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.status-ok { font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; background:#0d2318; color:#3fb950; border:1px solid #1a7f37; white-space:nowrap; }
+.pri-h { font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px; background:#2d1010; color:#f85149; border:1px solid #6b2020; white-space:nowrap; }
+.pri-m { font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px; background:#2a1500; color:#f0a040; border:1px solid #b7530a; white-space:nowrap; }
+.pri-l { font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px; background:#21262d; color:#6e7681; border:1px solid #30363d; white-space:nowrap; }
+.person-badge { font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:8px; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 헤더 -->
+  <div class="head">
+    <div>
+      <div class="title">🧪 HPDFS 테스트 케이스</div>
+      <div class="subtitle">Test Cases &middot; 2026.06.14–15 &middot; Agent / Backend / ML / DB / Frontend / Infra 통합</div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn active" onclick="show('S1',this)">📊 시각화 요약</button>
+      <button class="nav-btn" onclick="show('S2',this)">📋 테스트 케이스</button>
+    </div>
+  </div>
+
+  <!-- ══ S1 시각화 ══ -->
+  <div id="S1" class="scene active">
+
+    <!-- 요약 통계 카드 -->
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-label">총 테스트 수</div>
+        <div class="stat-val" style="color:#c9d1d9">51</div>
+        <div class="stat-desc">8개 구분 · 2일 수행</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">성공률</div>
+        <div class="stat-val" style="color:#3fb950">100%</div>
+        <div class="stat-desc">성공 51 · 실패 0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">우선순위 상</div>
+        <div class="stat-val" style="color:#f85149">27</div>
+        <div class="stat-desc">중 20개 · 하 4개</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">참여 인원</div>
+        <div class="stat-val" style="color:#58a6ff">6</div>
+        <div class="stat-desc">팀원 전원 참여</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">최다 테스트 구분</div>
+        <div class="stat-val" style="color:#58a6ff;font-size:20px;padding-top:4px">Backend</div>
+        <div class="stat-desc">10개 · 전체 20%</div>
+      </div>
+    </div>
+
+    <!-- 차트 그리드 -->
+    <div class="chart-grid">
+
+      <!-- 성공률 도넛 -->
+      <div class="chart-card">
+        <div class="chart-title">✅ 전체 성공률</div>
+        <div class="donut-area">
+          <div class="donut-wrap">
+            <svg class="donut-svg" viewBox="0 0 150 150">
+              <circle class="donut-track" cx="75" cy="75" r="65"/>
+              <circle class="donut-fill" cx="75" cy="75" r="65" id="donut-arc"/>
+            </svg>
+            <div class="donut-center">
+              <div class="donut-pct">100%</div>
+              <div class="donut-sub">전체 통과</div>
+            </div>
+          </div>
+          <div class="donut-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#3fb950"></div>
+              <span class="legend-key">성공</span>
+              <span class="legend-cnt">51</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#f85149"></div>
+              <span class="legend-key">실패</span>
+              <span class="legend-cnt">0</span>
+            </div>
+            <div style="margin-top:8px;padding-top:8px;border-top:1px solid #21262d">
+              <div style="font-size:10px;color:#6e7681;margin-bottom:4px">수행일</div>
+              <div style="font-size:11px;color:#8b949e">2026-06-14</div>
+              <div style="font-size:11px;color:#8b949e">2026-06-15</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 구분별 테스트 수 -->
+      <div class="chart-card">
+        <div class="chart-title">📂 구분별 테스트 수</div>
+        <div class="hbar-list" id="cat-bars"></div>
+      </div>
+
+      <!-- 우선순위 분포 -->
+      <div class="chart-card">
+        <div class="chart-title">🎯 우선순위 분포</div>
+        <div class="sbar-legend">
+          <div class="sbar-leg-item"><div class="sbar-leg-dot" style="background:#f85149"></div>상</div>
+          <div class="sbar-leg-item"><div class="sbar-leg-dot" style="background:#f0a040"></div>중</div>
+          <div class="sbar-leg-item"><div class="sbar-leg-dot" style="background:#484f58"></div>하</div>
+        </div>
+        <div class="sbar-list" id="pri-bars"></div>
+      </div>
+
+      <!-- 담당자별 기여도 -->
+      <div class="chart-card">
+        <div class="chart-title">👤 담당자별 기여도</div>
+        <div class="person-list" id="person-bars"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ S2 테스트 케이스 ══ -->
+  <div id="S2" class="scene">
+    <div class="tbl-wrap">
+      <div class="tbl-filters" id="tc-filters"></div>
+      <div class="tbl-scroll">
+        <table class="tc-table">
+          <thead><tr>
+            <th style="width:36px;text-align:center">No.</th>
+            <th style="width:11%">테스트 ID</th>
+            <th style="width:75px">구분</th>
+            <th style="width:75px">분류</th>
+            <th style="width:26%">테스트 항목 / 절차</th>
+            <th style="width:14%">입력 데이터</th>
+            <th style="width:28%">기대 결과</th>
+            <th style="width:72px">담당자</th>
+            <th style="width:55px">상태</th>
+            <th style="width:50px;text-align:center">우선</th>
+          </tr></thead>
+          <tbody id="tc-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+/* ── 데이터 ──────────────────────────────────────────── */
+const tests = [
+  {id:'TC-AG-001',cat:'Agent',     sub:'디스크 탐색',   item:'smartctl 디스크 탐색',         proc:'Agent 실행 후 smartctl --scan 결과 확인',    input:'로컬 PC HDD/SSD',              expect:'감지 가능한 디스크 목록이 반환된다',          person:'안세웅',pri:'상',date:'2026-06-14'},
+  {id:'TC-AG-002',cat:'Agent',     sub:'SMART 수집',    item:'SMART JSON 수집',               proc:'선택 디스크에 대해 smartctl -a -j 실행',     input:'/dev/sda',                    expect:'SMART 정보가 JSON 형태로 수집된다',           person:'안세웅',pri:'상',date:'2026-06-14'},
+  {id:'TC-AG-003',cat:'Agent',     sub:'피처 추출',     item:'모델 입력 피처 추출',           proc:'JSON에서 모델명, 용량, SMART raw 값 추출',   input:'SMART 5/9/187/188/194/197/198/199',expect:'모델 입력 컬럼이 누락 없이 생성된다',       person:'안세웅',pri:'상',date:'2026-06-14'},
+  {id:'TC-AG-004',cat:'Agent',     sub:'예외 처리',     item:'SMART 미지원 디스크 처리',      proc:'Agent 실행 후 예외 메시지 확인',             input:'SMART unavailable disk',      expect:'프로그램이 중단되지 않고 오류 사유를 표시한다', person:'안세웅',pri:'중',date:'2026-06-14'},
+  {id:'TC-AG-005',cat:'Agent',     sub:'전송',          item:'Backend API 전송',              proc:'수집된 SMART 데이터를 /api/diagnose로 전송', input:'정상 SMART payload',           expect:'API 응답을 정상 수신한다',                   person:'안세웅',pri:'상',date:'2026-06-14'},
+  {id:'TC-AG-006',cat:'Agent',     sub:'네트워크 예외', item:'Backend 미실행 시 처리',        proc:'Agent 전송 시도',                            input:'localhost API down',           expect:'전송 실패 메시지를 표시하고 종료된다',       person:'안세웅',pri:'중',date:'2026-06-14'},
+  {id:'TC-AG-007',cat:'Agent',     sub:'다중 디스크',   item:'복수 디스크 순차 전송',         proc:'각 디스크별 SMART 수집 및 전송',             input:'HDD + SSD',                   expect:'각 디스크가 개별 진단 요청으로 처리된다',    person:'안세웅',pri:'중',date:'2026-06-14'},
+  {id:'TC-AG-008',cat:'Agent',     sub:'데이터 형식',   item:'숫자형 raw 값 변환',            proc:'문자열 raw 값을 숫자형으로 변환',            input:'raw string 포함 SMART',        expect:'Backend 입력 형식에 맞게 변환된다',          person:'안세웅',pri:'중',date:'2026-06-14'},
+  {id:'TC-BE-001',cat:'Backend',   sub:'API',           item:'진단 API 정상 호출',            proc:'POST /api/diagnose 호출',                    input:'정상 SMART payload',           expect:'risk, final_level, reasons가 반환된다',      person:'홍제규',pri:'상',date:'2026-06-14'},
+  {id:'TC-BE-002',cat:'Backend',   sub:'API',           item:'필수값 누락 검증',              proc:'필수 컬럼 일부 제거 후 요청',                input:'smart_5_raw 누락',             expect:'입력 오류 응답을 반환한다',                  person:'홍제규',pri:'상',date:'2026-06-14'},
+  {id:'TC-BE-003',cat:'Backend',   sub:'API',           item:'잘못된 타입 검증',              proc:'숫자 컬럼에 문자열 입력 후 요청',            input:"capacity_bytes='abc'",         expect:'입력 오류 응답을 반환한다',                  person:'홍제규',pri:'중',date:'2026-06-14'},
+  {id:'TC-BE-004',cat:'Backend',   sub:'모델 로딩',     item:'pkl 모델 로드 확인',            proc:'Backend 시작 시 모델 로딩 로그 확인',        input:'모델 파일',                    expect:'모델이 정상 로드된다',                       person:'홍제규',pri:'상',date:'2026-06-14'},
+  {id:'TC-BE-005',cat:'Backend',   sub:'응답 포맷',     item:'진단 응답 구조 확인',           proc:'정상 payload 요청 후 응답 필드 확인',        input:'정상 SMART payload',           expect:'확률, 등급, 원인, 권장 조치가 포함된다',    person:'홍제규',pri:'상',date:'2026-06-14'},
+  {id:'TC-BE-006',cat:'Backend',   sub:'디스크 목록',   item:'디스크 목록 API 조회',          proc:'GET /api/disks 호출',                        input:'저장된 디스크 데이터',          expect:'디스크 목록이 반환된다',                     person:'홍제규',pri:'상',date:'2026-06-14'},
+  {id:'TC-BE-007',cat:'Backend',   sub:'디스크 상세',   item:'디스크 상세 API 조회',          proc:'GET /api/disks/{id} 호출',                   input:'disk_id',                     expect:'선택 디스크 상세 정보가 반환된다',           person:'홍제규',pri:'중',date:'2026-06-14'},
+  {id:'TC-BE-008',cat:'Backend',   sub:'진단 이력',     item:'진단 로그 API 조회',            proc:'디스크별 로그 조회 API 호출',                input:'disk_id',                     expect:'최근 진단 이력이 시간순으로 조회된다',       person:'홍제규',pri:'중',date:'2026-06-14'},
+  {id:'TC-BE-009',cat:'Backend',   sub:'수동 진단',     item:'수동 입력 진단',                proc:'수동 SMART 값을 입력하여 진단 요청',         input:'임의 SMART 값',               expect:'DB 오염 없이 진단 결과가 반환된다',          person:'홍제규',pri:'중',date:'2026-06-14'},
+  {id:'TC-BE-010',cat:'Backend',   sub:'예외 처리',     item:'모델 파일 누락 처리',           proc:'Backend 시작 또는 예측 호출',                input:'모델 파일 없음',               expect:'오류 원인이 로그에 남는다',                  person:'홍제규',pri:'하',date:'2026-06-14'},
+  {id:'TC-ML-001',cat:'Model',     sub:'예측',          item:'정상 디스크 예측',              proc:'정상 범위 SMART 입력',                       input:'smart_5=0, smart_197=0',       expect:'낮은 위험 확률과 정상 등급이 나온다',        person:'김응석',pri:'상',date:'2026-06-14'},
+  {id:'TC-ML-002',cat:'Model',     sub:'예측',          item:'주의 디스크 예측',              proc:'일부 이상 SMART 입력',                       input:'smart_197=1',                 expect:'주의 또는 위험 등급이 반환된다',             person:'김응석',pri:'상',date:'2026-06-14'},
+  {id:'TC-ML-003',cat:'Model',     sub:'예측',          item:'위험 디스크 예측',              proc:'치명 SMART 값 입력',                         input:'smart_5=745',                 expect:'위험 등급과 백업 권장 메시지가 반환된다',    person:'김응석',pri:'상',date:'2026-06-14'},
+  {id:'TC-ML-004',cat:'Model',     sub:'규칙 보정',     item:'재할당 섹터 보정',              proc:'smart_5_raw 값을 높게 입력',                 input:'smart_5_raw=100 이상',         expect:'ML 확률이 낮아도 위험도가 상향된다',         person:'김응석',pri:'상',date:'2026-06-14'},
+  {id:'TC-ML-005',cat:'Model',     sub:'규칙 보정',     item:'대기 섹터 보정',                proc:'smart_197_raw 값 입력',                      input:'smart_197_raw>0',             expect:'주의 이상 등급으로 보정된다',                person:'김응석',pri:'상',date:'2026-06-14'},
+  {id:'TC-ML-006',cat:'Model',     sub:'규칙 보정',     item:'정정 불가 섹터 보정',           proc:'smart_198_raw 값 입력',                      input:'smart_198_raw>0',             expect:'주의 이상 등급으로 보정된다',                person:'김응석',pri:'상',date:'2026-06-14'},
+  {id:'TC-ML-007',cat:'Model',     sub:'권장 조치',     item:'위험 원인 메시지 생성',         proc:'위험 SMART 값을 입력',                       input:'smart_5, smart_197 이상',      expect:'위험 원인과 권장 조치가 함께 표시된다',     person:'김응석',pri:'중',date:'2026-06-14'},
+  {id:'TC-ML-008',cat:'Model',     sub:'피처 순서',     item:'모델 입력 컬럼 순서 검증',      proc:'입력 데이터 컬럼 순서 확인',                 input:'모델 입력 배열',               expect:'학습 시 사용한 컬럼 순서와 일치한다',        person:'김응석',pri:'상',date:'2026-06-14'},
+  {id:'TC-DB-001',cat:'DB',        sub:'테이블',        item:'disks 테이블 저장',             proc:'진단 API 호출 후 disks 테이블 확인',         input:'진단 payload',                expect:'디스크 최신 상태가 저장된다',               person:'홍제규',pri:'상',date:'2026-06-14'},
+  {id:'TC-DB-002',cat:'DB',        sub:'테이블',        item:'diagnosis_logs 저장',           proc:'진단 API 호출 후 diagnosis_logs 확인',       input:'진단 payload',                expect:'진단 이력이 저장된다',                       person:'홍제규',pri:'상',date:'2026-06-14'},
+  {id:'TC-DB-003',cat:'DB',        sub:'관계',          item:'디스크-진단이력 1:N 관계',      proc:'동일 serial로 여러 번 진단 요청',            input:'동일 disk serial',             expect:'하나의 디스크에 여러 진단 로그가 연결된다', person:'홍제규',pri:'중',date:'2026-06-14'},
+  {id:'TC-DB-004',cat:'DB',        sub:'갱신',          item:'최신 상태 갱신',                proc:'같은 디스크를 다른 위험도로 재진단',         input:'same serial',                 expect:'disks는 최신 상태로 갱신되고 로그는 누적된다',person:'홍제규',pri:'상',date:'2026-06-14'},
+  {id:'TC-DB-005',cat:'DB',        sub:'초기화',        item:'DB 컨테이너 재시작',            proc:'DB 컨테이너 재시작 후 데이터 확인',          input:'postgresql container restart', expect:'볼륨 설정에 따라 데이터가 유지된다',         person:'홍제규',pri:'중',date:'2026-06-14'},
+  {id:'TC-FE-001',cat:'Frontend',  sub:'대시보드',      item:'요약 카드 표시',                proc:'대시보드 접속',                              input:'저장된 디스크 데이터',          expect:'전체/정상/주의/위험 개수가 표시된다',       person:'장영재',pri:'상',date:'2026-06-14'},
+  {id:'TC-FE-002',cat:'Frontend',  sub:'디스크 목록',   item:'디스크 목록 표시',              proc:'디스크 목록 화면 확인',                      input:'/api/disks 응답',              expect:'모델명, 용량, 등급, 최근 진단 시간이 표시된다',person:'장영재',pri:'상',date:'2026-06-14'},
+  {id:'TC-FE-003',cat:'Frontend',  sub:'상태 색상',     item:'위험도 색상 표시',              proc:'각 상태별 화면 표시 확인',                   input:'normal/warning/danger',        expect:'상태별 색상이 구분된다',                     person:'장영재',pri:'중',date:'2026-06-14'},
+  {id:'TC-FE-004',cat:'Frontend',  sub:'상세 화면',     item:'디스크 상세 정보 표시',         proc:'디스크 상세 화면 이동',                      input:'선택 disk_id',                expect:'SMART 지표와 위험 원인이 표시된다',          person:'장영재',pri:'상',date:'2026-06-14'},
+  {id:'TC-FE-005',cat:'Frontend',  sub:'진단 이력',     item:'진단 이력 표시',                proc:'진단 이력 영역 확인',                        input:'diagnosis_logs',              expect:'시간순 진단 이력이 표시된다',                person:'장영재',pri:'중',date:'2026-06-14'},
+  {id:'TC-FE-006',cat:'Frontend',  sub:'수동 진단',     item:'수동 입력 폼 동작',             proc:'수동 SMART 값을 입력 후 진단',               input:'수동 입력값',                  expect:'진단 결과가 화면에 표시된다',                person:'장영재',pri:'중',date:'2026-06-14'},
+  {id:'TC-FE-007',cat:'Frontend',  sub:'모델 성능',     item:'모델 성능 화면 표시',           proc:'모델 성능 메뉴 접속',                        input:'score csv',                   expect:'성능 지표가 표 또는 카드로 표시된다',        person:'장영재',pri:'하',date:'2026-06-14'},
+  {id:'TC-FE-008',cat:'Frontend',  sub:'SMART 설명',    item:'SMART 컬럼 설명 표시',          proc:'SMART 설명 메뉴 접속',                       input:'컬럼 설명 데이터',             expect:'SMART 5/9/197/198 등 설명이 표시된다',       person:'장영재',pri:'하',date:'2026-06-14'},
+  {id:'TC-FE-009',cat:'Frontend',  sub:'오류 처리',     item:'Backend 미실행 시 화면 처리',   proc:'대시보드 접속',                              input:'API down',                    expect:'사용자에게 연결 오류가 표시된다',            person:'장영재',pri:'중',date:'2026-06-14'},
+  {id:'TC-IN-001',cat:'Integration',sub:'Agent-Backend',item:'Agent 전송 통합 테스트',       proc:'Agent 실행 후 Backend 로그 확인',            input:'실제 SMART 데이터',           expect:'Backend가 요청을 수신하고 결과를 반환한다',  person:'이성룡',pri:'상',date:'2026-06-15'},
+  {id:'TC-IN-002',cat:'Integration',sub:'Backend-DB',  item:'진단 결과 저장 통합 테스트',    proc:'진단 API 호출 후 DB 확인',                   input:'진단 payload',                expect:'disks와 diagnosis_logs에 데이터가 저장된다', person:'이성룡',pri:'상',date:'2026-06-15'},
+  {id:'TC-IN-003',cat:'Integration',sub:'Frontend-Backend',item:'대시보드 API 연동 테스트', proc:'대시보드 접속 후 API 데이터 표시 확인',      input:'/api/disks',                  expect:'대시보드에 서버 데이터가 표시된다',          person:'이성룡',pri:'상',date:'2026-06-15'},
+  {id:'TC-IN-004',cat:'Integration',sub:'전체 흐름',   item:'전체 흐름 통합 테스트',         proc:'Agent 실행 후 대시보드 변화 확인',           input:'실제 SMART 데이터',           expect:'수집부터 화면 표시까지 전체 흐름이 동작한다',person:'이성룡',pri:'상',date:'2026-06-15'},
+  {id:'TC-IN-005',cat:'Infra',     sub:'Docker',       item:'Docker Compose 실행',           proc:'docker compose up 실행',                     input:'docker-compose.yml',          expect:'Backend, Frontend, DB, Nginx 컨테이너가 실행된다',person:'안세웅',pri:'중',date:'2026-06-15'},
+  {id:'TC-IN-006',cat:'Infra',     sub:'Nginx',        item:'Nginx 프록시 확인',             proc:'브라우저에서 서비스 주소 접속',              input:'localhost',                   expect:'Frontend와 Backend 요청이 프록시된다',       person:'안세웅',pri:'중',date:'2026-06-15'},
+  {id:'TC-IN-007',cat:'Infra',     sub:'Kubernetes',   item:'K8s manifest 문법 확인',        proc:'kubectl dry-run 또는 파일 구조 확인',        input:'k8s yaml',                    expect:'배포 파일 문법 오류가 없어야 한다',          person:'안세웅',pri:'하',date:'2026-06-15'},
+  {id:'TC-NF-001',cat:'Non-Functional',sub:'사용성',   item:'위험 등급 가독성 확인',         proc:'정상/주의/위험 상태 확인',                   input:'상태별 데이터',               expect:'사용자가 상태를 직관적으로 구분할 수 있다',  person:'이성룡',pri:'중',date:'2026-06-15'},
+  {id:'TC-NF-002',cat:'Non-Functional',sub:'신뢰성',   item:'규칙 보정 누락 방지',           proc:'ML 확률이 낮은 위험 데이터 입력',            input:'위험 SMART payload',          expect:'위험 SMART 지표가 최종 등급에 반영된다',    person:'김응석',pri:'상',date:'2026-06-15'},
+  {id:'TC-NF-003',cat:'Non-Functional',sub:'배포성',   item:'README 실행 절차 검증',         proc:'README 순서대로 서비스 실행',                input:'README commands',             expect:'문서만 보고 실행 가능해야 한다',             person:'공통',  pri:'중',date:'2026-06-15'},
+  {id:'TC-NF-004',cat:'Non-Functional',sub:'보안',     item:'불필요 개인정보 미수집 확인',   proc:'API 요청 payload 확인',                      input:'SMART payload',               expect:'저장장치 진단에 필요한 정보만 전송된다',    person:'공통',  pri:'중',date:'2026-06-15'},
+];
+
+/* ── 카테고리 색상 ────────────────────────────────────── */
+const catStyle = {
+  'Agent':           {bg:'#0d2318',txt:'#3fb950',brd:'#388e3c',bar:'#3fb950'},
+  'Backend':         {bg:'#0d1825',txt:'#58a6ff',brd:'#1f6feb',bar:'#58a6ff'},
+  'Model':           {bg:'#1f1a00',txt:'#d29922',brd:'#9a6700',bar:'#d29922'},
+  'DB':              {bg:'#2a1500',txt:'#f0a040',brd:'#b7530a',bar:'#f0a040'},
+  'Frontend':        {bg:'#1a0d2e',txt:'#d2a8ff',brd:'#6f42c1',bar:'#d2a8ff'},
+  'Integration':     {bg:'#0d1825',txt:'#79c0ff',brd:'#1d3a6e',bar:'#79c0ff'},
+  'Infra':           {bg:'#21262d',txt:'#8b949e',brd:'#444d56',bar:'#8b949e'},
+  'Non-Functional':  {bg:'#2a0d2a',txt:'#e88de8',brd:'#8e3a8e',bar:'#e88de8'},
+};
+
+/* ── 담당자 색상 ──────────────────────────────────────── */
+const personStyle = {
+  '안세웅': {bg:'#2a1500',txt:'#f0a040',bar:'#f0a040'},
+  '홍제규': {bg:'#0d2318',txt:'#3fb950',bar:'#3fb950'},
+  '김응석': {bg:'#0d1825',txt:'#58a6ff',bar:'#58a6ff'},
+  '장영재': {bg:'#1a0d2e',txt:'#d2a8ff',bar:'#d2a8ff'},
+  '이성룡': {bg:'#2d1010',txt:'#f85149',bar:'#f85149'},
+  '공통':   {bg:'#21262d',txt:'#8b949e',bar:'#8b949e'},
+};
+
+/* ── 장면 전환 ────────────────────────────────────────── */
+function show(id, btn) {
+  document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+/* ── 차트 렌더 ───────────────────────────────────────── */
+function renderCharts() {
+  const CATS = ['Agent','Backend','Model','DB','Frontend','Integration','Infra','Non-Functional'];
+  const catCount = {};
+  const catPri   = {};
+  CATS.forEach(c => { catCount[c] = 0; catPri[c] = {상:0,중:0,하:0}; });
+  tests.forEach(t => { catCount[t.cat]++; catPri[t.cat][t.pri]++; });
+
+  const maxCount = Math.max(...Object.values(catCount));
+
+  /* 구분별 바 */
+  document.getElementById('cat-bars').innerHTML = CATS.map(c => {
+    const cs = catStyle[c];
+    const pct = (catCount[c] / maxCount * 100).toFixed(1);
+    return `<div class="hbar-row">
+      <div class="hbar-label">${c}</div>
+      <div class="hbar-track">
+        <div class="hbar-fill" style="width:${pct}%;background:${cs.bar}22;border:1px solid ${cs.bar}40;color:${cs.txt}">
+          ${catCount[c]}개
+        </div>
+      </div>
+      <div class="hbar-num" style="color:${cs.txt}">${catCount[c]}</div>
+    </div>`;
+  }).join('');
+
+  /* 우선순위 스택 바 */
+  document.getElementById('pri-bars').innerHTML = CATS.map(c => {
+    const total = catCount[c];
+    const h = catPri[c]['상'], m = catPri[c]['중'], l = catPri[c]['하'];
+    const pctH = (h/total*100).toFixed(1), pctM = (m/total*100).toFixed(1), pctL = (l/total*100).toFixed(1);
+    return `<div class="sbar-row">
+      <div class="sbar-label">${c}</div>
+      <div class="sbar-track">
+        ${h ? `<div class="sbar-seg" style="width:${pctH}%;background:#da3633">${h}</div>` : ''}
+        ${m ? `<div class="sbar-seg" style="width:${pctM}%;background:#b7530a">${m}</div>` : ''}
+        ${l ? `<div class="sbar-seg" style="width:${pctL}%;background:#444d56">${l}</div>` : ''}
+      </div>
+      <div class="sbar-total">${total}</div>
+    </div>`;
+  }).join('');
+
+  /* 담당자별 바 */
+  const personCount = {};
+  const personCats  = {};
+  tests.forEach(t => {
+    personCount[t.person] = (personCount[t.person] || 0) + 1;
+    if (!personCats[t.person]) personCats[t.person] = new Set();
+    personCats[t.person].add(t.cat);
+  });
+  const pList = Object.entries(personCount).sort((a,b) => b[1]-a[1]);
+  const maxP  = pList[0][1];
+
+  document.getElementById('person-bars').innerHTML = pList.map(([p, cnt]) => {
+    const ps = personStyle[p] || {bg:'#21262d',txt:'#8b949e',bar:'#8b949e'};
+    const pct = (cnt / maxP * 100).toFixed(1);
+    const cats = [...personCats[p]].join(', ');
+    return `<div class="person-row">
+      <div class="person-name" style="color:${ps.txt}">${p}</div>
+      <div class="person-track">
+        <div class="person-bar" style="width:${pct}%;background:${ps.bar}25;border:1px solid ${ps.bar}40;color:${ps.txt}">
+          ${cnt}개<span class="person-cats">${cats}</span>
+        </div>
+      </div>
+      <div class="person-cnt" style="color:${ps.txt}">${cnt}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── 테이블 렌더 ─────────────────────────────────────── */
+let activeFilter = 'all';
+
+function renderFilters() {
+  const cats = ['all', ...Object.keys(catStyle)];
+  document.getElementById('tc-filters').innerHTML = cats.map(c => {
+    const isAll = c === 'all';
+    const cs = catStyle[c];
+    const cnt = isAll ? tests.length : tests.filter(t => t.cat === c).length;
+    const style = isAll ? '' : `border-color:${cs.brd};color:${cs.txt};`;
+    return `<button class="filter-btn ${isAll?'f-all':''} ${activeFilter===c?'f-active':''}"
+      style="${style}" onclick="setFilter('${c}')">${isAll?'전체':c} (${cnt})</button>`;
+  }).join('');
+}
+
+function setFilter(cat) {
+  activeFilter = cat;
+  renderFilters();
+  renderTable();
+}
+
+function renderTable() {
+  const rows = activeFilter === 'all' ? tests : tests.filter(t => t.cat === activeFilter);
+  const priCls = {상:'pri-h',중:'pri-m',하:'pri-l'};
+  document.getElementById('tc-body').innerHTML = rows.map((t, i) => {
+    const cs = catStyle[t.cat];
+    const ps = personStyle[t.person] || {bg:'#21262d',txt:'#8b949e'};
+    return `<tr>
+      <td style="color:#484f58;font-size:11px;text-align:center">${i+1}</td>
+      <td><span class="tc-id" style="color:${cs.txt}">${t.id}</span></td>
+      <td><span class="cat-badge" style="background:${cs.bg};color:${cs.txt};border-color:${cs.brd}">${t.cat}</span></td>
+      <td style="font-size:11px;color:#6e7681;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.sub}</td>
+      <td><div class="tc-item">${t.item}</div><div class="tc-sub">${t.proc}</div></td>
+      <td style="font-size:11px;font-family:'Consolas',monospace;color:#6e7681;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.input}</td>
+      <td><div class="tc-expect">${t.expect}</div></td>
+      <td><span class="person-badge" style="background:${ps.bg};color:${ps.txt}">${t.person}</span></td>
+      <td><span class="status-ok">성공</span></td>
+      <td style="text-align:center"><span class="${priCls[t.pri]}">${t.pri}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── 도넛 애니메이션 ──────────────────────────────────── */
+function animateDonut() {
+  const circ = 2 * Math.PI * 65;
+  const arc  = document.getElementById('donut-arc');
+  arc.style.strokeDasharray  = `${circ}`;
+  arc.style.strokeDashoffset = `${circ}`;
+  setTimeout(() => { arc.style.transition = 'stroke-dashoffset 1.2s ease'; arc.style.strokeDashoffset = '0'; }, 200);
+}
+
+/* ── 초기화 ───────────────────────────────────────────── */
+renderCharts();
+renderFilters();
+renderTable();
+animateDonut();
+</script>
+</body>
+</html>
