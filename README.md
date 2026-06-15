@@ -1,4 +1,4 @@
-# HPDFS — HDD Predictive Drive Failure System
+# PDFS — Predictive Drive Failure System
 
 > HDD/SSD SMART 데이터를 수집·분석해 고장을 사전에 예측하는 시스템.  
 > 온프레미스 EXE 도구(v1)에서 클라우드 인프라(v2)로 전환한 포트폴리오 프로젝트입니다.
@@ -24,7 +24,7 @@
 ```mermaid
 flowchart LR
     A[사용자 PC] -->|smartctl 실행| B[SMART 수집]
-    B --> C[ML 예측\nGradientBoosting]
+    B --> C[ML 예측\nRandomForest]
     C --> D[CSV 저장]
     D --> E[Streamlit\n로컬 렌더링]
 ```
@@ -68,7 +68,7 @@ flowchart TD
 | 영역 | v1 | v2 |
 |------|----|----|
 | 데이터 수집 | smartctl (EXE 내장) | 로컬 에이전트 (Python) |
-| ML 예측 | GradientBoosting (로컬) | GradientBoosting (FastAPI 서버) |
+| ML 예측 | RandomForest (로컬) | RandomForest (FastAPI 서버) |
 | 저장 | CSV 파일 | PostgreSQL |
 | 프론트엔드 | Streamlit (로컬) | Streamlit (Docker 컨테이너) |
 | 백엔드 | 없음 | FastAPI |
@@ -140,7 +140,7 @@ HPDFS/
     ├── frontend/        # Streamlit 대시보드
     ├── nginx/           # Nginx 리버스 프록시
     ├── k8s/             # Kubernetes 매니페스트
-    ├── docs/            # 설계 문서 · storyboard.html · troubleshooting.html
+    ├── docs/            # 설계 문서 및 프레젠테이션
     └── docker-compose.yml
 ```
 
@@ -148,11 +148,10 @@ HPDFS/
 
 ## ML 모델
 
-- **알고리즘**: GradientBoostingClassifier + 규칙 기반 하이브리드 예측
+- **알고리즘**: RandomForestClassifier
 - **입력**: SMART 지표 8개 (재할당섹터, 대기섹터, 정정불가섹터, 온도 등)
 - **출력**: 고장 확률(%) + 등급 (정상 / 주의 / 위험)
 - **데이터**: Backblaze HDD 고장 통계 데이터셋
-- **하이브리드 설계**: ML 단독 Recall 0.34 → SMART 임계값 규칙(대기섹터·정정불가 등)과 결합, 두 결과 중 높은 위험 등급을 최종 판정으로 채택
 
 ---
 

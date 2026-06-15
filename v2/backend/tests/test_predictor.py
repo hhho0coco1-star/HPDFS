@@ -1,6 +1,5 @@
 import pandas as pd
-import pytest
-from predictor import prob_to_level, rule_level, combine_level
+from predictor import prob_to_level, rule_level, combine_level, MODEL_THRESHOLD
 
 
 def make_row(**kwargs):
@@ -24,8 +23,11 @@ class TestProbToLevel:
     def test_위험(self):
         assert prob_to_level(0.8) == "위험"
 
-    def test_경계_030_주의(self):
-        assert prob_to_level(0.3) == "주의"
+    def test_threshold_미만_정상(self):
+        assert prob_to_level(MODEL_THRESHOLD - 0.01) == "정상"
+
+    def test_threshold_이상_주의(self):
+        assert prob_to_level(MODEL_THRESHOLD) == "주의"
 
     def test_경계_070_위험(self):
         assert prob_to_level(0.7) == "위험"

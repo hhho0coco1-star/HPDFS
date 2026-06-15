@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Any
 
 import pandas as pd
-
+import json
+from pathlib import Path
 
 FEATURES = [
     "model",
@@ -18,9 +19,21 @@ FEATURES = [
     "smart_199_raw",
 ]
 
+THRESHOLD_PATH = Path(__file__).resolve().parent / "models" / "storage_threshold.json"
+
+
+def load_model_threshold() -> float:
+    if THRESHOLD_PATH.exists():
+        with open(THRESHOLD_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return float(data.get("threshold", 0.5))
+    return 0.5
+
+
+MODEL_THRESHOLD = load_model_threshold()
 
 def prob_to_level(prob: float) -> str:
-    if prob < 0.3:
+    if prob < MODEL_THRESHOLD:
         return "정상"
     if prob < 0.7:
         return "주의"
@@ -81,7 +94,7 @@ def reasons_actions(row: pd.Series, prob: float) -> tuple[list[str], list[str]]:
 
 def predict(df: pd.DataFrame, model: Any) -> dict[str, Any]:
     prob = float(model.predict_proba(df)[0][1])
-    pred = int(prob >= 0.5)
+    pred = int(prob >= MODEL_THRESHOLD)
     row = df.iloc[0]
     ml = prob_to_level(prob)
     rule = rule_level(row)
