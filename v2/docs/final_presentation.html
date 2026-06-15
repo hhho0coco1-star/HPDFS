@@ -1,385 +1,805 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HPDFS 최종 발표 통합 자료</title>
-<style>
-* { box-sizing:border-box; margin:0; padding:0; }
-:root {
-  --bg:#0d1117;
-  --panel:#161b22;
-  --panel2:#1c2128;
-  --border:#30363d;
-  --text:#e6edf3;
-  --dim:#8b949e;
-  --muted:#6e7681;
-  --accent:#58a6ff;
-  --accent2:#1f6feb;
-  --ok:#3fb950;
-  --warn:#d29922;
-  --danger:#f85149;
-  --purple:#d2a8ff;
-}
-body {
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  height:100vh;
-  overflow:hidden;
-}
-.deck {
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  padding:12px 18px;
-  gap:10px;
-}
-.head {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:14px;
-  flex-shrink:0;
-}
-.brand { min-width:230px; }
-.title { font-size:17px; font-weight:900; color:var(--text); }
-.subtitle { font-size:11px; color:var(--dim); margin-top:2px; }
-.nav {
-  display:flex;
-  gap:5px;
-  align-items:center;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
-.nav-btn {
-  font-size:10.5px;
-  font-weight:800;
-  padding:5px 10px;
-  border-radius:20px;
-  border:1.5px solid var(--border);
-  background:var(--panel);
-  color:var(--dim);
-  cursor:pointer;
-  transition:all .15s;
-  white-space:nowrap;
-}
-.nav-btn:hover { border-color:var(--accent); color:var(--accent); }
-.nav-btn.active { background:var(--accent2); color:#fff; border-color:var(--accent2); }
-.slide {
-  display:none;
-  flex:1;
-  min-height:0;
-  border:1px solid var(--border);
-  border-radius:12px;
-  background:var(--panel);
-  overflow:hidden;
-  position:relative;
-}
-.slide.active { display:flex; }
-.iframe-slide { padding:0; }
-.iframe-slide iframe {
-  width:100%;
-  height:100%;
-  border:0;
-  background:var(--bg);
-}
-.slide-inner {
-  flex:1;
-  min-height:0;
-  padding:24px 28px;
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-  overflow:hidden;
-}
-.kicker {
-  font-size:11px;
-  font-weight:800;
-  color:var(--accent);
-  letter-spacing:.7px;
-  text-transform:uppercase;
-}
-.hero-title {
-  font-size:34px;
-  line-height:1.15;
-  font-weight:950;
-  color:var(--text);
-  letter-spacing:0;
-}
-.hero-title span { color:var(--accent); }
-.hero-desc {
-  font-size:14px;
-  color:var(--dim);
-  line-height:1.75;
-  max-width:900px;
-}
-.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-.grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-.card {
-  background:var(--panel2);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:16px 18px;
-  min-height:0;
-}
-.card.blue { border-left:4px solid var(--accent); }
-.card.green { border-left:4px solid var(--ok); }
-.card.warn { border-left:4px solid var(--warn); }
-.card.red { border-left:4px solid var(--danger); }
-.card.purple { border-left:4px solid var(--purple); }
-.card-title { font-size:14px; font-weight:900; color:var(--text); margin-bottom:8px; }
-.card-body { font-size:12.5px; color:var(--dim); line-height:1.65; }
-.tag-row { display:flex; gap:7px; flex-wrap:wrap; margin-top:8px; }
-.tag {
-  font-size:10.5px;
-  font-weight:800;
-  padding:4px 8px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  color:var(--dim);
-  background:#0d1117;
-}
-.flow {
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:10px;
-  margin-top:4px;
-}
-.flow-step {
-  background:#0d1117;
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:14px 12px;
-  position:relative;
-  min-height:112px;
-}
-.flow-step:not(:last-child)::after {
-  content:'→';
-  position:absolute;
-  right:-12px;
-  top:43%;
-  color:var(--accent);
-  font-weight:900;
-  z-index:2;
-}
-.flow-num {
-  width:24px;
-  height:24px;
-  border-radius:50%;
-  background:var(--accent2);
-  color:#fff;
-  display:grid;
-  place-items:center;
-  font-size:11px;
-  font-weight:900;
-  margin-bottom:8px;
-}
-.flow-name { font-size:13px; font-weight:900; color:var(--text); }
-.flow-desc { font-size:11px; color:var(--dim); line-height:1.5; margin-top:5px; }
-.wire-grid {
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:14px;
-  flex:1;
-  min-height:0;
-}
-.wire-shot {
-  border:1px solid var(--border);
-  border-radius:10px;
-  overflow:hidden;
-  background:#010409;
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-}
-.wire-shot img {
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  min-height:0;
-  padding:8px;
-}
-.wire-caption {
-  flex-shrink:0;
-  padding:9px 12px;
-  border-top:1px solid var(--border);
-  font-size:12px;
-  color:var(--dim);
-  background:#0d1117;
-}
-.member-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; flex:1; min-height:0; }
-.member-card {
-  background:var(--panel2);
-  border:1px dashed #3f4652;
-  border-radius:10px;
-  padding:16px 14px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  min-height:0;
-}
-.member-name {
-  font-size:13px;
-  font-weight:900;
-  color:var(--text);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-.member-role {
-  font-size:11px;
-  font-weight:800;
-  color:var(--accent);
-  padding:3px 8px;
-  border:1px solid rgba(88,166,255,.35);
-  border-radius:12px;
-  background:#0d1825;
-}
-.memo-box {
-  flex:1;
-  min-height:120px;
-  border:1px solid var(--border);
-  border-radius:8px;
-  background:#0d1117;
-  padding:12px;
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.7;
-}
-.footer-hint {
-  flex-shrink:0;
-  font-size:11px;
-  color:var(--muted);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding-top:2px;
-}
-.progress {
-  color:var(--accent);
-  font-weight:800;
-}
-@media (max-width:1100px) {
-  .grid-3, .grid-4, .flow, .member-grid { grid-template-columns:1fr 1fr; }
-  .wire-grid { grid-template-columns:1fr; }
-  .hero-title { font-size:28px; }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HPDFS 최종 발표 자료</title>
+  <style>
+    :root {
+      --bg: #0b1017;
+      --panel: #151b24;
+      --panel-2: #10161e;
+      --line: #2c3644;
+      --muted: #a8b3c2;
+      --text: #f4f7fb;
+      --blue: #4da3ff;
+      --green: #3ddc84;
+      --amber: #f2b84b;
+      --danger: #ff6b6b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(77, 163, 255, 0.14), transparent 30%),
+        radial-gradient(circle at 82% 12%, rgba(61, 220, 132, 0.10), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Pretendard", "Noto Sans KR", "Segoe UI", Arial, sans-serif;
+    }
+
+    .deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      padding: 46px 58px 42px;
+    }
+
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide-titlebar {
+      flex: 0 0 auto;
+      margin-bottom: 22px;
+    }
+
+    .slide-kicker {
+      color: var(--blue);
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0;
+      margin-bottom: 12px;
+    }
+
+    .slide-title {
+      margin: 0;
+      font-size: 42px;
+      line-height: 1.14;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .slide-desc {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.7;
+      max-width: 1180px;
+    }
+
+    .content {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .cover-slide {
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+      position: relative;
+    }
+
+    .cover-slide::before {
+      content: "";
+      position: absolute;
+      inset: 54px;
+      border: 1px solid rgba(77, 163, 255, 0.18);
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(77, 163, 255, 0.10), transparent 34%),
+        linear-gradient(315deg, rgba(61, 220, 132, 0.08), transparent 36%);
+      pointer-events: none;
+    }
+
+    .cover-inner {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, 86vw);
+      padding: 88px 70px;
+      border-top: 4px solid var(--blue);
+      border-bottom: 4px solid var(--green);
+    }
+
+    .cover-title {
+      margin: 0;
+      font-size: clamp(92px, 12vw, 176px);
+      line-height: 0.92;
+      font-weight: 950;
+      letter-spacing: 0;
+    }
+
+    .cover-subtitle {
+      margin: 34px 0 0;
+      color: var(--muted);
+      font-size: clamp(26px, 3vw, 42px);
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 8px;
+    }
+
+    .toc-item,
+    .card,
+    .person-card,
+    .stack-card,
+    .note-card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 14px 38px rgba(0, 0, 0, 0.18);
+    }
+
+    .toc-item {
+      min-height: 92px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .toc-no {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: rgba(77, 163, 255, 0.14);
+      color: var(--blue);
+      font-size: 18px;
+      font-weight: 900;
+      border: 1px solid rgba(77, 163, 255, 0.34);
+      flex: 0 0 auto;
+    }
+
+    .toc-name {
+      font-size: 22px;
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.12fr 0.88fr;
+      gap: 22px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .card h3,
+    .person-card h3,
+    .stack-card h3,
+    .note-card h3 {
+      margin: 0 0 14px;
+      font-size: 24px;
+      line-height: 1.3;
+      font-weight: 850;
+    }
+
+    .card p,
+    .card li,
+    .stack-card li,
+    .note-card p {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.72;
+    }
+
+    .card ul,
+    .stack-card ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .flow-box {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .flow-step {
+      border: 1px solid rgba(77, 163, 255, 0.28);
+      background: rgba(77, 163, 255, 0.08);
+      border-radius: 10px;
+      padding: 16px 14px;
+      min-height: 112px;
+    }
+
+    .flow-step strong {
+      display: block;
+      color: var(--blue);
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .flow-step span {
+      color: var(--text);
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.42;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .person-card {
+      min-height: 205px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .person-card h3 {
+      font-size: 22px;
+    }
+
+    .role {
+      display: inline-flex;
+      align-self: flex-start;
+      padding: 7px 12px;
+      border-radius: 999px;
+      color: var(--blue);
+      border: 1px solid rgba(77, 163, 255, 0.42);
+      background: rgba(77, 163, 255, 0.10);
+      font-weight: 850;
+      font-size: 14px;
+    }
+
+    .person-card p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin: 18px 0 0;
+    }
+
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .stack-card {
+      min-height: 270px;
+    }
+
+    .stack-card h3 {
+      color: var(--text);
+    }
+
+    .stack-card b {
+      color: var(--text);
+    }
+
+    .wireframe-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .wireframe-card {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .wireframe-card h3 {
+      margin: 0 0 14px;
+      font-size: 22px;
+    }
+
+    .wireframe-card img {
+      width: 100%;
+      flex: 1 1 auto;
+      object-fit: contain;
+      min-height: 0;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #0a0f15;
+    }
+
+    .frame-shell {
+      flex: 1 1 auto;
+      min-height: 0;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #0f141b;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #0f141b;
+    }
+
+    .reflection-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .note-card {
+      min-height: 355px;
+      border-style: dashed;
+    }
+
+    .note-card h3 {
+      font-size: 21px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .note-area {
+      margin-top: 16px;
+      height: 230px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(4, 8, 13, 0.62);
+      padding: 18px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+      white-space: pre-line;
+    }
+
+    .bottom-note {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 6px;
+    }
+
+    .accent-blue { border-left: 5px solid var(--blue); }
+    .accent-green { border-left: 5px solid var(--green); }
+    .accent-amber { border-left: 5px solid var(--amber); }
+    .accent-danger { border-left: 5px solid var(--danger); }
+
+    .controls {
+      position: fixed;
+      right: 28px;
+      bottom: 22px;
+      z-index: 50;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .controls button {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(21, 27, 36, 0.9);
+      color: var(--text);
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .counter {
+      color: var(--muted);
+      font-size: 14px;
+      min-width: 70px;
+      text-align: center;
+      background: rgba(21, 27, 36, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 13px;
+    }
+
+    @media (max-width: 1100px) {
+      body {
+        overflow: auto;
+      }
+
+      .deck,
+      .slide {
+        width: 100%;
+        min-height: 100vh;
+        height: auto;
+      }
+
+      .slide {
+        padding: 34px 24px 90px;
+      }
+
+      .toc-grid,
+      .overview-grid,
+      .team-grid,
+      .stack-grid,
+      .wireframe-grid,
+      .reflection-grid,
+      .bottom-note,
+      .flow-box {
+        grid-template-columns: 1fr;
+      }
+
+      .frame-shell {
+        min-height: 720px;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="deck">
-  <div class="head">
-    <div class="brand">
-      <div class="title">HPDFS 최종 발표 통합 자료</div>
-      <div class="subtitle">Predictive Drive Failure System · Final Presentation</div>
-    </div>
-    <div class="nav" id="nav"></div>
+  <main class="deck">
+    <section class="slide cover-slide active" data-title="HPDFS">
+      <div class="cover-inner">
+        <h1 class="cover-title">HPDFS</h1>
+        <p class="cover-subtitle">- 저장장치 고장 예측 시스템 -</p>
+      </div>
+    </section>
+
+    <section class="slide" data-title="목차">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">01 Contents</div>
+        <h2 class="slide-title">목차</h2>
+      </div>
+      <div class="content">
+        <div class="toc-grid">
+          <div class="toc-item"><div class="toc-no">01</div><div class="toc-name">목차</div></div>
+          <div class="toc-item"><div class="toc-no">02</div><div class="toc-name">프로젝트 개요</div></div>
+          <div class="toc-item"><div class="toc-no">03</div><div class="toc-name">팀원 소개</div></div>
+          <div class="toc-item"><div class="toc-no">04</div><div class="toc-name">기술 스택</div></div>
+          <div class="toc-item"><div class="toc-no">05</div><div class="toc-name">WBS</div></div>
+          <div class="toc-item"><div class="toc-no">06</div><div class="toc-name">요구사항 명세서</div></div>
+          <div class="toc-item"><div class="toc-no">07</div><div class="toc-name">메뉴 트리 / 사용자 시나리오</div></div>
+          <div class="toc-item"><div class="toc-no">08</div><div class="toc-name">와이어프레임</div></div>
+          <div class="toc-item"><div class="toc-no">09</div><div class="toc-name">스토리보드</div></div>
+          <div class="toc-item"><div class="toc-no">10</div><div class="toc-name">테이블 정의서 / ERD</div></div>
+          <div class="toc-item"><div class="toc-no">11</div><div class="toc-name">테스트 케이스</div></div>
+          <div class="toc-item"><div class="toc-no">12</div><div class="toc-name">트러블 슈팅 및 회고</div></div>
+          <div class="toc-item"><div class="toc-no">13</div><div class="toc-name">느낀점</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="프로젝트 개요">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">02 Project Overview</div>
+        <h2 class="slide-title">프로젝트 개요</h2>
+        <p class="slide-desc">HPDFS는 클라이언트 PC의 저장장치 SMART 데이터를 수집하고, 머신러닝 모델과 규칙 기반 보정을 결합해 고장 위험도를 진단하는 시스템입니다.</p>
+      </div>
+      <div class="content">
+        <div class="overview-grid">
+          <div class="card accent-blue">
+            <h3>핵심 문제</h3>
+            <ul>
+              <li>일반 사용자는 재할당 섹터, 대기 섹터, 정정 불가 섹터, CRC 오류 같은 SMART 지표를 직접 해석하기 어렵습니다.</li>
+              <li>디스크 고장은 데이터 손실로 이어질 수 있지만, 대부분의 사용자는 위험 신호를 사전에 확인하지 못합니다.</li>
+              <li>단순 수치 표시가 아니라 위험도, 원인, 조치 방향을 함께 제공하는 진단 흐름이 필요했습니다.</li>
+            </ul>
+          </div>
+          <div class="card accent-green">
+            <h3>해결 방향</h3>
+            <ul>
+              <li>Agent가 로컬 저장장치의 SMART 정보를 수집합니다.</li>
+              <li>Backend는 학습된 모델로 고장 확률을 계산하고, 주요 SMART 규칙으로 결과를 보정합니다.</li>
+              <li>Dashboard는 디스크별 상태, 위험도, 위험 원인, 권장 조치를 한 화면에서 제공합니다.</li>
+            </ul>
+          </div>
+          <div class="card accent-amber" style="grid-column: 1 / -1;">
+            <h3>전체 데이터 흐름</h3>
+            <div class="flow-box">
+              <div class="flow-step"><strong>Step 1</strong><span>Agent 실행</span></div>
+              <div class="flow-step"><strong>Step 2</strong><span>SMART 데이터 수집</span></div>
+              <div class="flow-step"><strong>Step 3</strong><span>API 전송</span></div>
+              <div class="flow-step"><strong>Step 4</strong><span>ML 예측 / DB 저장</span></div>
+              <div class="flow-step"><strong>Step 5</strong><span>Dashboard 조회</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="팀원 소개">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">03 Team</div>
+        <h2 class="slide-title">팀원 소개</h2>
+        <p class="slide-desc">기획, 데이터/모델, 백엔드, 프론트엔드, 인프라, 테스트 영역을 나누어 짧은 기간 안에 기능 구현과 발표 자료를 병행했습니다.</p>
+      </div>
+      <div class="content">
+        <div class="team-grid">
+          <div class="person-card">
+            <div>
+              <h3>김응석</h3>
+              <span class="role">Data / ML</span>
+              <p>Backblaze 데이터셋 정리, SMART 피처 선정, 모델 학습 및 성능 평가를 담당했습니다.</p>
+            </div>
+          </div>
+          <div class="person-card">
+            <div>
+              <h3>홍제규</h3>
+              <span class="role">Backend / DB</span>
+              <p>진단 API, DB 모델, 저장 흐름 등 서버 중심 기능을 담당했습니다.</p>
+            </div>
+          </div>
+          <div class="person-card">
+            <div>
+              <h3>장영재</h3>
+              <span class="role">Frontend</span>
+              <p>대시보드, 디스크 목록, 상세 화면 등 사용자 화면 구성을 담당했습니다.</p>
+            </div>
+          </div>
+          <div class="person-card">
+            <div>
+              <h3>안세웅</h3>
+              <span class="role">Infra / Agent</span>
+              <p>Agent 수집 구조, Docker Compose, Nginx, Kubernetes 배포 파일을 담당했습니다.</p>
+            </div>
+          </div>
+          <div class="person-card">
+            <div>
+              <h3>이성룡</h3>
+              <span class="role">Backend / DB</span>
+              <p>Backend와 DB 흐름 검증, 통합 테스트, 시연 데이터 준비를 담당했습니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="기술 스택">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">04 Tech Stack</div>
+        <h2 class="slide-title">기술 스택</h2>
+        <p class="slide-desc">로컬 수집 Agent와 서버형 진단 대시보드를 분리하고, Docker 기반으로 실행 환경을 통합했습니다.</p>
+      </div>
+      <div class="content">
+        <div class="stack-grid">
+          <div class="stack-card accent-blue">
+            <h3>Agent</h3>
+            <ul>
+              <li><b>Python</b></li>
+              <li>SMART 데이터 수집</li>
+              <li>수집값 파싱 및 API 전송</li>
+              <li>반복 진단 스케줄</li>
+            </ul>
+          </div>
+          <div class="stack-card accent-green">
+            <h3>Backend / Model</h3>
+            <ul>
+              <li><b>FastAPI</b></li>
+              <li><b>scikit-learn</b></li>
+              <li><b>pandas / joblib</b></li>
+              <li>GradientBoosting 모델 로딩</li>
+            </ul>
+          </div>
+          <div class="stack-card accent-amber">
+            <h3>Database / Dashboard</h3>
+            <ul>
+              <li><b>PostgreSQL</b></li>
+              <li><b>Streamlit</b></li>
+              <li>디스크 정보 저장</li>
+              <li>진단 이력 조회</li>
+            </ul>
+          </div>
+          <div class="stack-card accent-danger">
+            <h3>Infra</h3>
+            <ul>
+              <li><b>Docker Compose</b></li>
+              <li><b>Nginx</b></li>
+              <li><b>Kubernetes</b></li>
+              <li>로컬 실행 및 클라우드 확장 설계</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="WBS">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">05 WBS</div>
+        <h2 class="slide-title">WBS</h2>
+      </div>
+      <div class="frame-shell"><iframe src="wbs.html"></iframe></div>
+    </section>
+
+    <section class="slide" data-title="요구사항 명세서">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">06 Requirements</div>
+        <h2 class="slide-title">요구사항 명세서</h2>
+      </div>
+      <div class="frame-shell"><iframe src="requirements.html"></iframe></div>
+    </section>
+
+    <section class="slide" data-title="메뉴 트리 / 사용자 시나리오">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">07 Menu / Scenario</div>
+        <h2 class="slide-title">메뉴 트리 / 사용자 시나리오</h2>
+      </div>
+      <div class="frame-shell"><iframe src="menu_scenario.html"></iframe></div>
+    </section>
+
+    <section class="slide" data-title="와이어프레임">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">08 Wireframe</div>
+        <h2 class="slide-title">와이어프레임</h2>
+      </div>
+      <div class="content">
+        <div class="wireframe-grid">
+          <div class="wireframe-card">
+            <h3>대시보드</h3>
+            <img src="images/dashboard.png" alt="대시보드 와이어프레임">
+          </div>
+          <div class="wireframe-card">
+            <h3>디스크 상세</h3>
+            <img src="images/disk_detail.png" alt="디스크 상세 와이어프레임">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="스토리보드">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">09 Storyboard</div>
+        <h2 class="slide-title">스토리보드</h2>
+      </div>
+      <div class="frame-shell"><iframe src="storyboard.html"></iframe></div>
+    </section>
+
+    <section class="slide" data-title="테이블 정의서 / ERD">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">10 Table / ERD</div>
+        <h2 class="slide-title">테이블 정의서 / ERD</h2>
+      </div>
+      <div class="frame-shell"><iframe src="table_definition.html"></iframe></div>
+    </section>
+
+    <section class="slide" data-title="테스트 케이스">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">11 Test Cases</div>
+        <h2 class="slide-title">테스트 케이스</h2>
+      </div>
+      <div class="frame-shell"><iframe src="test_cases.html"></iframe></div>
+    </section>
+
+    <section class="slide" data-title="트러블 슈팅 및 회고">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">12 Troubleshooting</div>
+        <h2 class="slide-title">트러블 슈팅 및 회고</h2>
+      </div>
+      <div class="frame-shell"><iframe src="troubleshooting.html"></iframe></div>
+    </section>
+
+    <section class="slide" data-title="느낀점">
+      <div class="slide-titlebar">
+        <div class="slide-kicker">13 Retrospective</div>
+        <h2 class="slide-title">느낀점</h2>
+        <p class="slide-desc">팀원별 최종 회고를 채워 넣는 페이지입니다. 각자 프로젝트를 진행하며 느낀 점을 중심으로 작성합니다.</p>
+      </div>
+      <div class="content">
+        <div class="reflection-grid">
+          <div class="note-card">
+            <h3>김응석 <span class="role">Data / ML</span></h3>
+            <div class="note-area">느낀점:</div>
+          </div>
+          <div class="note-card">
+            <h3>홍제규 <span class="role">Backend / DB</span></h3>
+            <div class="note-area">느낀점:</div>
+          </div>
+          <div class="note-card">
+            <h3>장영재 <span class="role">Frontend</span></h3>
+            <div class="note-area">느낀점:</div>
+          </div>
+          <div class="note-card">
+            <h3>안세웅 <span class="role">Infra / Agent</span></h3>
+            <div class="note-area">느낀점:</div>
+          </div>
+          <div class="note-card">
+            <h3>이성룡 <span class="role">Backend / DB</span></h3>
+            <div class="note-area">느낀점:</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="controls" aria-label="slide controls">
+    <button type="button" id="prevBtn" aria-label="이전 슬라이드">‹</button>
+    <div class="counter" id="counter">1 / 14</div>
+    <button type="button" id="nextBtn" aria-label="다음 슬라이드">›</button>
   </div>
 
-  <section class="slide active" data-title="개요">
-    <div class="slide-inner">
-      <div class="kicker">00 Project Overview</div>
-      <div class="hero-title">SMART 기반 <span>저장장치 고장 예측</span> 및 모니터링 시스템</div>
-      <div class="hero-desc">
-        HPDFS는 클라이언트 PC의 HDD/SSD SMART 데이터를 Agent가 수집하고, Backend가 ML 모델과 SMART 규칙 보정을 통해 고장 위험도를 계산한 뒤,
-        PostgreSQL에 저장된 결과를 Dashboard에서 확인하는 시스템입니다.
-      </div>
-      <div class="grid-3">
-        <div class="card blue"><div class="card-title">문제 정의</div><div class="card-body">재할당 섹터, 대기 섹터, 정정 불가 섹터, CRC 오류 등 SMART 지표는 일반 사용자가 해석하기 어렵습니다.</div></div>
-        <div class="card green"><div class="card-title">해결 방향</div><div class="card-body">SMART 수집 → 모델 예측 → 규칙 보정 → 정상/주의/위험 등급화로 결과를 단순하고 빠르게 판단할 수 있게 했습니다.</div></div>
-        <div class="card warn"><div class="card-title">v2 확장</div><div class="card-body">단일 EXE 중심 구조에서 Agent, Backend, DB, Dashboard, Nginx, Docker/K8s 구조로 확장했습니다.</div></div>
-      </div>
-      <div class="flow">
-        <div class="flow-step"><div class="flow-num">1</div><div class="flow-name">Agent</div><div class="flow-desc">client PC에서 SMART 데이터 수집</div></div>
-        <div class="flow-step"><div class="flow-num">2</div><div class="flow-name">Nginx</div><div class="flow-desc">/api 요청을 backend로 프록시</div></div>
-        <div class="flow-step"><div class="flow-num">3</div><div class="flow-name">FastAPI</div><div class="flow-desc">ML 예측과 SMART 규칙 보정</div></div>
-        <div class="flow-step"><div class="flow-num">4</div><div class="flow-name">PostgreSQL</div><div class="flow-desc">최신 상태와 진단 이력 저장</div></div>
-        <div class="flow-step"><div class="flow-num">5</div><div class="flow-name">Dashboard</div><div class="flow-desc">전체 현황, 상세 이력, 조치 상태 조회</div></div>
-      </div>
-      <div class="footer-hint"><span>발표 흐름: 기획 → 요구사항 → 화면 → 데이터 설계 → 검증/회고</span><span class="progress">00 / 10</span></div>
-    </div>
-  </section>
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const counter = document.getElementById("counter");
+    let current = 0;
 
-  <section class="slide iframe-slide" data-title="WBS"><iframe src="wbs.html"></iframe></section>
-  <section class="slide iframe-slide" data-title="요구사항"><iframe src="requirements.html"></iframe></section>
-  <section class="slide iframe-slide" data-title="메뉴/시나리오"><iframe src="menu_scenario.html"></iframe></section>
+    function cleanFrame(frame) {
+      try {
+        const doc = frame.contentDocument || frame.contentWindow.document;
+        if (!doc || !doc.head) return;
+        const style = doc.createElement("style");
+        style.textContent = `
+          .head, .ts-head, .sb-head { display: none !important; }
+          .wrap, .ts-wrap, .sb-wrap { padding-top: 8px !important; height: 100vh !important; }
+          .scene, .scene-content { min-height: 0 !important; }
+          body { overflow: auto !important; }
+        `;
+        doc.head.appendChild(style);
+      } catch (e) {
+        /* same-origin 문서만 정리 */
+      }
+    }
 
-  <section class="slide" data-title="와이어프레임">
-    <div class="slide-inner">
-      <div class="kicker">04 Wireframe</div>
-      <div class="hero-title" style="font-size:28px;">대시보드 중심의 화면 설계</div>
-      <div class="hero-desc">사용자가 가장 먼저 봐야 하는 전체 상태, 위험 디스크, 진단 이력을 빠르게 확인하도록 화면을 구성했습니다.</div>
-      <div class="wire-grid">
-        <div class="wire-shot">
-          <img src="images/dashboard.png" alt="dashboard wireframe">
-          <div class="wire-caption">대시보드: 전체 디스크 수, 정상/주의/위험 요약, 위험도 분포, 전체 목록</div>
-        </div>
-        <div class="wire-shot">
-          <img src="images/disk_detail.png" alt="disk detail wireframe">
-          <div class="wire-caption">디스크 상세: 위험도, 최근 진단 이력, 주요 SMART 지표, 조치 상태 관리</div>
-        </div>
-      </div>
-      <div class="grid-3">
-        <div class="card blue"><div class="card-title">정보 우선순위</div><div class="card-body">전체 현황을 먼저 보여주고, 위험 디스크를 빠르게 선택할 수 있도록 구성했습니다.</div></div>
-        <div class="card green"><div class="card-title">관리자 흐름</div><div class="card-body">대시보드 → 디스크 상세 → 조치 상태 변경 흐름을 기준으로 화면을 설계했습니다.</div></div>
-        <div class="card purple"><div class="card-title">설명 보조</div><div class="card-body">SMART 컬럼 설명과 수동진단을 제공해 시연과 이해도를 보완했습니다.</div></div>
-      </div>
-    </div>
-  </section>
+    function showSlide(index) {
+      current = Math.max(0, Math.min(slides.length - 1, index));
+      slides.forEach((slide, i) => slide.classList.toggle("active", i === current));
+      counter.textContent = `${current + 1} / ${slides.length}`;
+      document.title = `${slides[current].dataset.title || "HPDFS"} - HPDFS`;
+      slides[current].querySelectorAll("iframe").forEach(cleanFrame);
+    }
 
-  <section class="slide iframe-slide" data-title="스토리보드"><iframe src="storyboard.html"></iframe></section>
-  <section class="slide iframe-slide" data-title="테이블/ERD"><iframe src="table_definition.html"></iframe></section>
-  <section class="slide iframe-slide" data-title="테스트"><iframe src="test_cases.html"></iframe></section>
-  <section class="slide iframe-slide" data-title="트러블슈팅"><iframe src="troubleshooting.html"></iframe></section>
+    function nextSlide() {
+      showSlide(current + 1);
+    }
 
-  <section class="slide" data-title="느낀점">
-    <div class="slide-inner">
-      <div class="kicker">09 Retrospective</div>
-      <div class="hero-title" style="font-size:28px;">팀원별 느낀점</div>
-      <div class="hero-desc">최종 발표 전 팀원별 회고 내용을 채워 넣는 페이지입니다. 담당 영역, 어려웠던 점, 배운 점, 개선하고 싶은 점을 중심으로 작성합니다.</div>
-      <div class="member-grid">
-        <div class="member-card"><div class="member-name">김응석 <span class="member-role">Data / ML</span></div><div class="memo-box">- 담당 내용:<br>- 어려웠던 점:<br>- 배운 점:<br>- 개선점:</div></div>
-        <div class="member-card"><div class="member-name">홍제규 <span class="member-role">Backend</span></div><div class="memo-box">- 담당 내용:<br>- 어려웠던 점:<br>- 배운 점:<br>- 개선점:</div></div>
-        <div class="member-card"><div class="member-name">장영재 <span class="member-role">Frontend / DB</span></div><div class="memo-box">- 담당 내용:<br>- 어려웠던 점:<br>- 배운 점:<br>- 개선점:</div></div>
-        <div class="member-card"><div class="member-name">안세웅 <span class="member-role">Infra / Agent</span></div><div class="memo-box">- 담당 내용:<br>- 어려웠던 점:<br>- 배운 점:<br>- 개선점:</div></div>
-        <div class="member-card"><div class="member-name">이성룡 <span class="member-role">Test / Demo</span></div><div class="memo-box">- 담당 내용:<br>- 어려웠던 점:<br>- 배운 점:<br>- 개선점:</div></div>
-      </div>
-      <div class="grid-3">
-        <div class="card blue"><div class="card-title">공통 회고 포인트</div><div class="card-body">로컬 하드웨어 접근, Agent-Server 분리, Docker 기반 실행 환경을 실제로 연결하며 시스템 구조를 이해했습니다.</div></div>
-        <div class="card warn"><div class="card-title">발표 전 체크</div><div class="card-body">각 팀원별 느낀점은 3~4줄 이내로 짧게 작성하고, 담당 영역과 실제 문제 해결 경험을 중심으로 정리합니다.</div></div>
-        <div class="card green"><div class="card-title">마무리 메시지</div><div class="card-body">단일 진단 프로그램에서 중앙 모니터링 구조로 확장하며, 예측 모델을 서비스 흐름에 연결하는 경험을 얻었습니다.</div></div>
-      </div>
-    </div>
-  </section>
-</div>
-<script>
-const slides = [...document.querySelectorAll('.slide')];
-const nav = document.getElementById('nav');
-let current = 0;
+    function prevSlide() {
+      showSlide(current - 1);
+    }
 
-slides.forEach((slide, idx) => {
-  const btn = document.createElement('button');
-  btn.className = 'nav-btn' + (idx === 0 ? ' active' : '');
-  btn.textContent = `${String(idx).padStart(2,'0')} ${slide.dataset.title}`;
-  btn.onclick = () => showSlide(idx);
-  nav.appendChild(btn);
-});
+    document.getElementById("nextBtn").addEventListener("click", nextSlide);
+    document.getElementById("prevBtn").addEventListener("click", prevSlide);
 
-function showSlide(idx) {
-  current = Math.max(0, Math.min(slides.length - 1, idx));
-  slides.forEach((s, i) => s.classList.toggle('active', i === current));
-  [...nav.children].forEach((b, i) => b.classList.toggle('active', i === current));
-}
+    document.addEventListener("keydown", (event) => {
+      if (["ArrowRight", "PageDown", " "].includes(event.key)) {
+        event.preventDefault();
+        nextSlide();
+      }
+      if (["ArrowLeft", "PageUp"].includes(event.key)) {
+        event.preventDefault();
+        prevSlide();
+      }
+      if (event.key === "Home") {
+        event.preventDefault();
+        showSlide(0);
+      }
+      if (event.key === "End") {
+        event.preventDefault();
+        showSlide(slides.length - 1);
+      }
+    });
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight' || e.key === 'PageDown') showSlide(current + 1);
-  if (e.key === 'ArrowLeft' || e.key === 'PageUp') showSlide(current - 1);
-  if (/^[0-9]$/.test(e.key)) {
-    const n = Number(e.key);
-    if (n < slides.length) showSlide(n);
-  }
-});
-</script>
+    document.querySelectorAll("iframe").forEach((frame) => {
+      frame.addEventListener("load", () => cleanFrame(frame));
+    });
+
+    showSlide(0);
+  </script>
 </body>
 </html>
