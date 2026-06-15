@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: melooong/pdfs-backend:latest
+          # previous image: melooong/pdfs-backend:latest
+          image: 256688076284.dkr.ecr.ap-northeast-2.amazonaws.com/hpdfs-backend:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: DATABASE_URL
@@ -45,3 +46,5 @@ spec:
               port: 8010
             initialDelaySeconds: 5
             periodSeconds: 10
+
+

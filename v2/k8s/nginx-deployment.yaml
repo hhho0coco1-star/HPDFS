@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx
@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: melooong/pdfs-nginx:latest
+          # image: melooong/pdfs-nginx:latest # 이전 로컬버전
+          image: 256688076284.dkr.ecr.ap-northeast-2.amazonaws.com/hpdfs-nginx:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
@@ -39,3 +40,5 @@ spec:
               port: 80
             initialDelaySeconds: 3
             periodSeconds: 10
+
+

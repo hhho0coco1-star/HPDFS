@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: melooong/pdfs-frontend:latest
+          # image: melooong/pdfs-frontend:latest # 이전 로컬버전
+          image: 256688076284.dkr.ecr.ap-northeast-2.amazonaws.com/hpdfs-frontend:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: API_URL
@@ -43,3 +44,5 @@ spec:
               port: 8501
             initialDelaySeconds: 15
             periodSeconds: 10
+
+
