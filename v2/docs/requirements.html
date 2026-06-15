@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HPDFS 요구사항 명세서</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#0d1117; height:100vh; overflow:hidden; }
+.wrap { display:flex; flex-direction:column; height:100vh; padding:12px 18px; gap:10px; }
+
+/* ── 헤더 ── */
+.head { display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.title { font-size:17px; font-weight:900; color:#e6edf3; }
+.subtitle { font-size:11px; color:#8b949e; margin-top:2px; }
+.nav { display:flex; gap:5px; }
+.nav-btn { font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; border:1.5px solid #30363d; background:#161b22; color:#8b949e; cursor:pointer; transition:all .15s; }
+.nav-btn:hover { border-color:#58a6ff; color:#58a6ff; }
+.nav-btn.active { background:#1f6feb; color:#fff; border-color:#1f6feb; }
+
+/* ── 장면 ── */
+.scene { display:none; flex:1; min-height:0; flex-direction:column; gap:0; }
+.scene.active { display:flex; }
+
+/* ── 공통 래퍼 ── */
+.req-wrap { flex:1; min-height:0; display:flex; flex-direction:column; background:#161b22; border-radius:10px; border:1px solid #30363d; overflow:hidden; }
+
+/* ── 필터 + 통계 바 ── */
+.top-bar { background:#0d1117; border-bottom:1px solid #21262d; flex-shrink:0; }
+.stat-row { display:flex; align-items:center; gap:10px; padding:8px 14px 0; }
+.stat-chip { font-size:11px; font-weight:700; padding:3px 10px; border-radius:10px; }
+.stat-total { background:#21262d; color:#c9d1d9; }
+.stat-h { background:#2d1010; color:#f85149; }
+.stat-m { background:#2a1500; color:#f0a040; }
+.filter-row { display:flex; gap:5px; padding:6px 14px 8px; flex-wrap:wrap; align-items:center; }
+.filter-btn { font-size:10px; font-weight:700; padding:2px 10px; border-radius:10px; border:1.5px solid; cursor:pointer; background:transparent; transition:opacity .15s; opacity:.45; }
+.filter-btn:hover { opacity:.8; }
+.filter-btn.f-active { opacity:1; }
+.filter-btn.f-all { border-color:#30363d; color:#8b949e; }
+.filter-btn.f-all.f-active { background:#21262d; }
+
+/* ── 테이블 ── */
+.req-scroll { flex:1; overflow-y:auto; }
+.req-scroll::-webkit-scrollbar { width:3px; }
+.req-scroll::-webkit-scrollbar-thumb { background:#30363d; border-radius:2px; }
+
+.req-table { width:100%; border-collapse:collapse; font-size:12px; table-layout:fixed; }
+.req-table th { padding:8px 12px; text-align:left; font-size:10px; font-weight:800; letter-spacing:.4px; color:#6e7681; text-transform:uppercase; background:#0d1117; border-bottom:2px solid #21262d; white-space:nowrap; position:sticky; top:0; z-index:1; }
+.req-table td { padding:10px 12px; border-bottom:1px solid #1c2128; color:#8b949e; vertical-align:top; overflow:hidden; }
+.req-table tr:last-child td { border-bottom:none; }
+.req-table tr:hover td { background:#1c2128; }
+
+/* 셀 콘텐츠 */
+.req-id { font-family:"Consolas",monospace; font-size:11px; font-weight:700; }
+.req-name { font-weight:700; color:#c9d1d9; font-size:12px; line-height:1.4; }
+.req-detail { font-size:11px; color:#8b949e; margin-top:3px; line-height:1.5; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; }
+.req-criteria { font-size:11px; color:#6e7681; line-height:1.5; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; }
+.pri-badge { display:inline-block; font-size:10px; font-weight:800; padding:2px 9px; border-radius:10px; white-space:nowrap; }
+.pri-h { background:#2d1010; color:#f85149; border:1px solid #6b2020; }
+.pri-m { background:#2a1500; color:#f0a040; border:1px solid #b7530a; }
+.comp-badge { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px; border-radius:9px; white-space:nowrap; border:1.5px solid; }
+.seq-num { font-size:11px; color:#484f58; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 헤더 -->
+  <div class="head">
+    <div>
+      <div class="title">📋 HPDFS 요구사항 명세서</div>
+      <div class="subtitle">Requirements Specification &middot; 기능 17개 &middot; 비기능 8개 &middot; 총 25개</div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn active" onclick="show('S1',this)">⚙️ 기능 요구사항</button>
+      <button class="nav-btn" onclick="show('S2',this)">🛡️ 비기능 요구사항</button>
+    </div>
+  </div>
+
+  <!-- ══ S1 기능 요구사항 ══ -->
+  <div id="S1" class="scene active">
+    <div class="req-wrap">
+      <div class="top-bar">
+        <div class="stat-row">
+          <span class="stat-chip stat-total" id="f-stat-total">전체 17개</span>
+          <span class="stat-chip stat-h" id="f-stat-h">우선순위 상 —</span>
+          <span class="stat-chip stat-m" id="f-stat-m">우선순위 중 —</span>
+        </div>
+        <div class="filter-row" id="f-filters"></div>
+      </div>
+      <div class="req-scroll">
+        <table class="req-table">
+          <thead><tr>
+            <th style="width:36px;text-align:center">No.</th>
+            <th style="width:11%">요구사항 ID</th>
+            <th style="width:15%">요구사항명</th>
+            <th style="width:37%">상세 내용</th>
+            <th style="width:60px;text-align:center">우선순위</th>
+            <th style="width:27%">수용 기준</th>
+            <th style="width:10%">컴포넌트</th>
+          </tr></thead>
+          <tbody id="f-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ S2 비기능 요구사항 ══ -->
+  <div id="S2" class="scene">
+    <div class="req-wrap">
+      <div class="top-bar">
+        <div class="stat-row">
+          <span class="stat-chip stat-total" id="nf-stat-total">전체 8개</span>
+          <span class="stat-chip stat-h" id="nf-stat-h">우선순위 상 —</span>
+          <span class="stat-chip stat-m" id="nf-stat-m">우선순위 중 —</span>
+        </div>
+        <div class="filter-row" id="nf-filters"></div>
+      </div>
+      <div class="req-scroll">
+        <table class="req-table">
+          <thead><tr>
+            <th style="width:36px;text-align:center">No.</th>
+            <th style="width:11%">요구사항 ID</th>
+            <th style="width:15%">요구사항명</th>
+            <th style="width:37%">상세 내용</th>
+            <th style="width:60px;text-align:center">우선순위</th>
+            <th style="width:27%">수용 기준</th>
+            <th style="width:10%">카테고리</th>
+          </tr></thead>
+          <tbody id="nf-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+/* ── 데이터 ──────────────────────────────────────────── */
+const reqF = [
+  {id:'REQ-F-001', name:'저장장치 자동 탐색',   detail:'Agent는 smartctl --scan 명령을 통해 로컬 PC의 HDD/SSD 목록을 탐색해야 한다.', pri:'상', criteria:'실행 시 감지 가능한 디스크 목록이 출력되어야 한다.',                                                                comp:'Agent'},
+  {id:'REQ-F-002', name:'SMART 정보 수집',       detail:'Agent는 smartctl -a -j 명령을 이용해 선택된 디스크의 SMART 정보를 JSON 형태로 수집해야 한다.',       pri:'상', criteria:'모델명, 용량, SMART raw 값이 수집되어야 한다.',                                                                        comp:'Agent'},
+  {id:'REQ-F-003', name:'SMART 피처 추출',       detail:'수집된 SMART JSON에서 모델 입력에 필요한 컬럼을 추출해야 한다.',                                       pri:'상', criteria:'model, capacity_bytes, smart_5/9/187/188/194/197/198/199 값이 생성되어야 한다.',                                  comp:'Agent'},
+  {id:'REQ-F-004', name:'진단 API 전송',         detail:'Agent는 수집 및 전처리된 SMART 데이터를 Backend의 진단 API로 전송해야 한다.',                          pri:'상', criteria:'/api/diagnose 호출 시 정상 응답을 받아야 한다.',                                                                    comp:'Agent'},
+  {id:'REQ-F-005', name:'ML 고장 위험 예측',     detail:'Backend는 저장된 머신러닝 모델을 이용해 고장 위험 확률을 계산해야 한다.',                              pri:'상', criteria:'입력 SMART 데이터에 대해 0~1 사이의 고장 위험 확률이 반환되어야 한다.',                                          comp:'Backend'},
+  {id:'REQ-F-006', name:'SMART 규칙 기반 보정',  detail:'Backend는 재할당 섹터, 대기 섹터, 정정 불가 섹터 등 주요 지표를 기반으로 위험도를 보정해야 한다.',    pri:'상', criteria:'ML 결과가 낮더라도 치명 SMART 지표가 있으면 최종 등급이 상향되어야 한다.',                                      comp:'Backend'},
+  {id:'REQ-F-007', name:'최종 위험 등급 산출',   detail:'시스템은 저장장치 상태를 정상, 주의, 위험 중 하나로 분류해야 한다.',                                    pri:'상', criteria:'API 응답에 final_level 값이 포함되어야 한다.',                                                                    comp:'Backend'},
+  {id:'REQ-F-008', name:'위험 원인 제공',        detail:'시스템은 위험 판정의 주요 원인을 사용자에게 제공해야 한다.',                                             pri:'중', criteria:'재할당 섹터, CRC 오류 등 원인이 메시지로 표시되어야 한다.',                                                       comp:'Backend/Frontend'},
+  {id:'REQ-F-009', name:'권장 조치 제공',        detail:'시스템은 위험 상태에 따른 권장 조치를 제공해야 한다.',                                                  pri:'중', criteria:'백업, 케이블 점검, 디스크 교체 검토 등의 조치가 표시되어야 한다.',                                              comp:'Backend/Frontend'},
+  {id:'REQ-F-010', name:'진단 결과 저장',        detail:'Backend는 진단 결과를 DB에 저장해야 한다.',                                                             pri:'상', criteria:'진단 로그가 diagnosis_logs 테이블에 저장되어야 한다.',                                                          comp:'DB'},
+  {id:'REQ-F-011', name:'디스크 최신 상태 저장', detail:'Backend는 각 디스크의 최신 위험 상태를 저장해야 한다.',                                                 pri:'상', criteria:'disks 테이블에서 디스크별 최신 final_level과 risk를 조회할 수 있어야 한다.',                                   comp:'DB'},
+  {id:'REQ-F-012', name:'대시보드 요약 표시',    detail:'Frontend는 전체 디스크 수와 정상/주의/위험 디스크 수를 요약 카드로 표시해야 한다.',                     pri:'상', criteria:'대시보드 첫 화면에서 상태별 개수가 표시되어야 한다.',                                                            comp:'Frontend'},
+  {id:'REQ-F-013', name:'디스크 목록 표시',      detail:'Frontend는 등록된 디스크 목록과 주요 상태 정보를 표시해야 한다.',                                       pri:'상', criteria:'디스크 모델명, 용량, 위험도, 상태, 최근 진단 시간이 표시되어야 한다.',                                          comp:'Frontend'},
+  {id:'REQ-F-014', name:'디스크 상세 조회',      detail:'Frontend는 특정 디스크의 상세 SMART 지표와 위험 판단 근거를 표시해야 한다.',                            pri:'상', criteria:'선택한 디스크의 SMART 5, 197, 198, 194 등 핵심값이 표시되어야 한다.',                                          comp:'Frontend'},
+  {id:'REQ-F-015', name:'진단 이력 조회',        detail:'Frontend는 디스크별 과거 진단 로그를 조회할 수 있어야 한다.',                                           pri:'중', criteria:'최근 진단 이력이 시간순으로 표시되어야 한다.',                                                                  comp:'Frontend'},
+  {id:'REQ-F-016', name:'데모 데이터 주입',      detail:'발표 시연을 위해 위험/주의/정상 상태의 샘플 데이터를 주입할 수 있어야 한다.',                           pri:'중', criteria:'데모 실행 후 대시보드에 샘플 디스크가 표시되어야 한다.',                                                       comp:'Backend/Frontend'},
+  {id:'REQ-F-017', name:'수동 진단',             detail:'SMART 자동 수집이 어려운 환경을 위해 사용자가 직접 SMART 값을 입력해 진단할 수 있어야 한다.',           pri:'중', criteria:'수동 입력값으로도 고장 위험도와 최종 등급이 출력되어야 한다.',                                                  comp:'Frontend/Backend'},
+];
+
+const reqNF = [
+  {id:'REQ-NF-001', name:'로컬 Agent 기반 수집', detail:'브라우저가 직접 하드웨어에 접근하지 않고 Agent가 로컬에서 SMART 정보를 수집해야 한다.',                pri:'상', criteria:'웹 UI만으로 직접 디스크 접근을 시도하지 않아야 한다.',                                                           comp:'구조'},
+  {id:'REQ-NF-002', name:'보안',                 detail:'Agent와 Backend 간 통신 데이터에는 저장장치 진단에 필요한 최소 정보만 포함해야 한다.',                  pri:'중', criteria:'불필요한 개인정보가 API 요청에 포함되지 않아야 한다.',                                                        comp:'보안'},
+  {id:'REQ-NF-003', name:'확장성',               detail:'시스템은 단일 PC 진단에서 다중 PC 중앙 모니터링 구조로 확장 가능해야 한다.',                            pri:'중', criteria:'PC 식별자 또는 device 정보 기반으로 여러 디스크를 구분 저장할 수 있어야 한다.',                            comp:'확장'},
+  {id:'REQ-NF-004', name:'유지보수성',           detail:'ML 예측 로직과 SMART 규칙 보정 로직은 분리되어 관리되어야 한다.',                                        pri:'중', criteria:'predictor.py에서 예측 함수와 규칙 보정 함수가 구분되어야 한다.',                                            comp:'Backend'},
+  {id:'REQ-NF-005', name:'사용성',               detail:'사용자는 디스크 상태를 수치뿐 아니라 정상/주의/위험 등급으로 이해할 수 있어야 한다.',                    pri:'상', criteria:'대시보드에 색상과 등급으로 상태가 표시되어야 한다.',                                                          comp:'UI'},
+  {id:'REQ-NF-006', name:'배포성',               detail:'Docker Compose를 통해 Backend, Frontend, DB를 한 번에 실행할 수 있어야 한다.',                           pri:'중', criteria:'docker compose up 실행 시 주요 서비스가 기동되어야 한다.',                                                  comp:'Infra'},
+  {id:'REQ-NF-007', name:'신뢰성',               detail:'모델이 놓칠 수 있는 위험 SMART 지표는 규칙 기반으로 보정되어야 한다.',                                   pri:'상', criteria:'재할당 섹터 100 이상 또는 대기 섹터 존재 시 최종 등급이 위험 또는 주의로 상향되어야 한다.',              comp:'모델'},
+  {id:'REQ-NF-008', name:'테스트 가능성',        detail:'예측 로직과 API는 테스트 코드로 검증 가능해야 한다.',                                                     pri:'중', criteria:'pytest 기반 단위 테스트 또는 API 테스트가 실행되어야 한다.',                                              comp:'테스트'},
+];
+
+/* ── 컴포넌트 색상 ────────────────────────────────────── */
+const compStyle = {
+  'Agent':          {bg:'#0d2318',txt:'#3fb950',brd:'#388e3c'},
+  'Backend':        {bg:'#0d1825',txt:'#58a6ff',brd:'#1f6feb'},
+  'Frontend':       {bg:'#1a0d2e',txt:'#d2a8ff',brd:'#6f42c1'},
+  'DB':             {bg:'#2a1500',txt:'#f0a040',brd:'#b7530a'},
+  'Backend/Frontend':{bg:'#0d1220',txt:'#93b9ff',brd:'#3a60c0'},
+  'Frontend/Backend':{bg:'#0d1220',txt:'#93b9ff',brd:'#3a60c0'},
+  '구조':           {bg:'#1c2128',txt:'#8b949e',brd:'#30363d'},
+  '보안':           {bg:'#2d1010',txt:'#f85149',brd:'#6b2020'},
+  '확장':           {bg:'#061f1f',txt:'#39d0c8',brd:'#0e7070'},
+  'UI':             {bg:'#0d1825',txt:'#79c0ff',brd:'#1d3a6e'},
+  'Infra':          {bg:'#21262d',txt:'#8b949e',brd:'#444d56'},
+  '모델':           {bg:'#1f1a00',txt:'#d29922',brd:'#9a6700'},
+  '테스트':         {bg:'#2a0d2a',txt:'#e88de8',brd:'#8e3a8e'},
+};
+
+/* ── 장면 전환 ────────────────────────────────────────── */
+function show(id, btn) {
+  document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+/* ── 공통 렌더 ───────────────────────────────────────── */
+function renderSection(data, filterId, bodyId, statTotal, statH, statM, activeComp) {
+  /* 고유 컴포넌트 목록 */
+  const comps = [...new Set(data.map(r => r.comp))];
+
+  /* 필터 버튼 */
+  const filterEl = document.getElementById(filterId);
+  filterEl.innerHTML = [
+    `<button class="filter-btn f-all ${activeComp==='all'?'f-active':''}" onclick="${filterId.startsWith('f')?'fFilter':'nfFilter'}('all')">전체 (${data.length})</button>`,
+    ...comps.map(c => {
+      const cs = compStyle[c] || {bg:'#21262d',txt:'#8b949e',brd:'#30363d'};
+      const cnt = data.filter(r => r.comp === c).length;
+      return `<button class="filter-btn ${activeComp===c?'f-active':''}"
+        style="border-color:${cs.brd};color:${cs.txt};"
+        onclick="${filterId.startsWith('f')?'fFilter':'nfFilter'}('${c}')">${c} (${cnt})</button>`;
+    })
+  ].join('');
+
+  /* 필터 적용 */
+  const rows = activeComp === 'all' ? data : data.filter(r => r.comp === activeComp);
+
+  /* 통계 업데이트 */
+  const cntH = rows.filter(r => r.pri === '상').length;
+  const cntM = rows.filter(r => r.pri === '중').length;
+  document.getElementById(statTotal).textContent = `조회 ${rows.length}개`;
+  document.getElementById(statH).textContent = `우선순위 상 ${cntH}개`;
+  document.getElementById(statM).textContent = `우선순위 중 ${cntM}개`;
+
+  /* 테이블 행 렌더 */
+  document.getElementById(bodyId).innerHTML = rows.map((r, i) => {
+    const cs = compStyle[r.comp] || {bg:'#21262d',txt:'#8b949e',brd:'#30363d'};
+    const idColor = r.id.startsWith('REQ-F') ? '#58a6ff' : '#d29922';
+    return `<tr>
+      <td class="seq-num">${i + 1}</td>
+      <td><span class="req-id" style="color:${idColor}">${r.id}</span></td>
+      <td><div class="req-name">${r.name}</div></td>
+      <td><div class="req-detail">${r.detail}</div></td>
+      <td style="text-align:center">
+        <span class="pri-badge ${r.pri==='상'?'pri-h':'pri-m'}">${r.pri}</span>
+      </td>
+      <td><div class="req-criteria">${r.criteria}</div></td>
+      <td><span class="comp-badge" style="background:${cs.bg};color:${cs.txt};border-color:${cs.brd}">${r.comp}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── 필터 핸들러 ─────────────────────────────────────── */
+let fComp = 'all', nfComp = 'all';
+
+function fFilter(comp) {
+  fComp = comp;
+  renderSection(reqF, 'f-filters', 'f-body', 'f-stat-total', 'f-stat-h', 'f-stat-m', fComp);
+}
+function nfFilter(comp) {
+  nfComp = comp;
+  renderSection(reqNF, 'nf-filters', 'nf-body', 'nf-stat-total', 'nf-stat-h', 'nf-stat-m', nfComp);
+}
+
+/* ── 초기화 ───────────────────────────────────────────── */
+fFilter('all');
+nfFilter('all');
+</script>
+</body>
+</html>

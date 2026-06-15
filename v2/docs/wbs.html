@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HPDFS WBS</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#0d1117; height:100vh; overflow:hidden; }
+.wrap { display:flex; flex-direction:column; height:100vh; padding:12px 18px; gap:10px; }
+
+/* ── 헤더 ── */
+.head { display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.title { font-size:17px; font-weight:900; color:#e6edf3; }
+.subtitle { font-size:11px; color:#8b949e; margin-top:2px; }
+.nav { display:flex; gap:5px; }
+.nav-btn { font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; border:1.5px solid #30363d; background:#161b22; color:#8b949e; cursor:pointer; transition:all .15s; }
+.nav-btn:hover { border-color:#58a6ff; color:#58a6ff; }
+.nav-btn.active { background:#1f6feb; color:#fff; border-color:#1f6feb; }
+
+/* ── 장면 ── */
+.scene { display:none; flex:1; min-height:0; flex-direction:column; }
+.scene.active { display:flex; }
+
+/* ══ WBS 테이블 ══ */
+.wbs-wrap { flex:1; min-height:0; display:flex; flex-direction:column; background:#161b22; border-radius:10px; border:1px solid #30363d; overflow:hidden; }
+
+.wbs-filters { padding:8px 12px; background:#0d1117; border-bottom:1px solid #21262d; display:flex; gap:6px; flex-shrink:0; flex-wrap:wrap; align-items:center; }
+.filter-btn { font-size:10.5px; font-weight:700; padding:3px 11px; border-radius:12px; border:1.5px solid; cursor:pointer; background:transparent; transition:all .15s; opacity:.55; }
+.filter-btn:hover { opacity:.85; }
+.filter-btn.f-active { opacity:1; }
+.filter-btn.f-all { border-color:#30363d; color:#8b949e; }
+.filter-btn.f-all.f-active { background:#21262d; }
+
+.wbs-scroll { flex:1; overflow-y:auto; }
+.wbs-scroll::-webkit-scrollbar { width:3px; }
+.wbs-scroll::-webkit-scrollbar-thumb { background:#30363d; border-radius:2px; }
+
+.wbs-table { width:100%; border-collapse:collapse; font-size:12px; table-layout:fixed; }
+.wbs-table th { padding:8px 12px; text-align:left; font-size:10px; font-weight:800; letter-spacing:.4px; color:#6e7681; text-transform:uppercase; background:#0d1117; border-bottom:2px solid #21262d; white-space:nowrap; position:sticky; top:0; z-index:1; }
+.wbs-table td { padding:9px 12px; border-bottom:1px solid #1c2128; color:#8b949e; vertical-align:middle; overflow:hidden; }
+.wbs-table tr:last-child td { border-bottom:none; }
+.wbs-table tr:hover td { background:#1c2128; }
+
+.cat-badge { font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px; white-space:nowrap; border:1.5px solid; }
+.status-done { font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; background:#0d2318; color:#3fb950; border:1px solid #1a7f37; white-space:nowrap; }
+.task-name { font-weight:600; color:#c9d1d9; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.task-detail { font-size:10.5px; color:#6e7681; margin-top:2px; line-height:1.4; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.person-badge { font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:8px; white-space:nowrap; }
+.pri-h { color:#f85149; font-weight:700; }
+.pri-m { color:#d29922; font-weight:700; }
+
+/* ══ 간트 차트 ══ */
+.gantt-wrap { flex:1; min-height:0; display:flex; flex-direction:column; background:#161b22; border-radius:10px; border:1px solid #30363d; overflow:hidden; }
+
+.gantt-header { display:flex; background:#0d1117; border-bottom:2px solid #21262d; flex-shrink:0; }
+.gantt-left-head { width:250px; flex-shrink:0; padding:8px 14px; font-size:10px; font-weight:800; color:#6e7681; text-transform:uppercase; border-right:1px solid #21262d; }
+.gantt-dates { flex:1; display:flex; }
+.gantt-day-col { flex:1; text-align:center; padding:5px 2px; border-right:1px solid #1c2128; min-width:0; }
+.gantt-day-col:last-child { border-right:none; }
+.gantt-day-num { font-size:11px; font-weight:800; color:#6e7681; }
+.gantt-day-name { font-size:9px; color:#484f58; margin-top:1px; }
+.gantt-day-col.weekend { background:#0a0d14; }
+.gantt-day-col.weekend .gantt-day-num { color:#30363d; }
+.gantt-day-col.today-d { background:#1f6feb18; }
+.gantt-day-col.today-d .gantt-day-num { color:#58a6ff; }
+
+.gantt-body { flex:1; overflow-y:auto; }
+.gantt-body::-webkit-scrollbar { width:3px; }
+.gantt-body::-webkit-scrollbar-thumb { background:#30363d; border-radius:2px; }
+
+.gantt-cat-sep { display:flex; background:#0d1117; border-bottom:1px solid #21262d; border-top:1px solid #21262d; }
+.gantt-cat-label { width:250px; flex-shrink:0; padding:5px 14px; font-size:9px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; border-right:1px solid #21262d; display:flex; align-items:center; gap:6px; }
+.gantt-cat-bg { flex:1; }
+
+.gantt-row { display:flex; border-bottom:1px solid #1c2128; min-height:38px; }
+.gantt-row:last-child { border-bottom:none; }
+.gantt-row:hover .gantt-info { background:#1c2128; }
+.gantt-info { width:250px; flex-shrink:0; padding:6px 14px; border-right:1px solid #21262d; display:flex; flex-direction:column; justify-content:center; gap:3px; }
+.gantt-task { font-size:11px; font-weight:600; color:#c9d1d9; line-height:1.3; }
+.gantt-meta { display:flex; align-items:center; gap:5px; }
+.gantt-person { font-size:9.5px; font-weight:700; padding:1px 6px; border-radius:8px; }
+.gantt-sub { font-size:9px; color:#484f58; }
+
+.gantt-timeline { flex:1; position:relative; overflow:hidden; }
+.g-bg { position:absolute; top:0; bottom:0; }
+.g-bg.weekend { background:#0a0d14; }
+.g-bg.today-line { background:#1f6feb0c; border-right:1px dashed #1f6feb50; }
+.gantt-bar { position:absolute; top:50%; transform:translateY(-50%); height:20px; border-radius:10px; display:flex; align-items:center; padding:0 8px; font-size:9px; font-weight:700; color:rgba(255,255,255,.9); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; box-shadow:0 2px 8px rgba(0,0,0,.4); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 헤더 -->
+  <div class="head">
+    <div>
+      <div class="title">📋 HPDFS WBS</div>
+      <div class="subtitle">Work Breakdown Structure &middot; 2026.06.04 – 06.16 &middot; 총 36개 작업</div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn active" onclick="show('S1',this)">📊 WBS 전체</button>
+      <button class="nav-btn" onclick="show('S2',this)">📅 간트 차트</button>
+    </div>
+  </div>
+
+  <!-- S1: WBS 테이블 -->
+  <div id="S1" class="scene active">
+    <div class="wbs-wrap">
+      <div class="wbs-filters" id="filters"></div>
+      <div class="wbs-scroll">
+        <table class="wbs-table">
+          <thead><tr>
+            <th style="width:36px;text-align:center">No.</th>
+            <th style="width:65px">구분</th>
+            <th style="width:80px">분류</th>
+            <th style="width:40%">작업 / 기능상세</th>
+            <th style="width:78px">담당자</th>
+            <th style="width:62px">상태</th>
+            <th style="width:38px;text-align:center">우선</th>
+            <th style="width:116px">기간</th>
+          </tr></thead>
+          <tbody id="wbs-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- S2: 간트 차트 -->
+  <div id="S2" class="scene">
+    <div class="gantt-wrap">
+      <div class="gantt-header">
+        <div class="gantt-left-head">작업 / 담당자</div>
+        <div class="gantt-dates" id="gantt-dates"></div>
+      </div>
+      <div class="gantt-body" id="gantt-body"></div>
+    </div>
+  </div>
+
+</div>
+<script>
+/* ── 데이터 ────────────────────────────────────────────── */
+const tasks = [
+  {id:1, cat:'기획',sub:'기획',   task:'프로젝트 주제 확정',       detail:'SMART 기반 저장장치 고장 예측 및 모니터링 시스템 주제 확정',                          person:'공통',  pri:'상',s:'2026-06-04',e:'2026-06-04'},
+  {id:2, cat:'기획',sub:'기획',   task:'프로젝트 범위 정의',        detail:'로컬 Agent 기반 SMART 수집, 서버형 대시보드, ML 예측 범위 정의',                        person:'공통',  pri:'상',s:'2026-06-04',e:'2026-06-05'},
+  {id:3, cat:'기획',sub:'문서',   task:'WBS 작성',                  detail:'개발 일정, 작업 단위, 담당 영역 정리',                                                   person:'김응석',pri:'상',s:'2026-06-05',e:'2026-06-08'},
+  {id:4, cat:'기획',sub:'문서',   task:'요구사항 명세서 작성',      detail:'기능 요구사항, 비기능 요구사항, 제약사항 정리',                                          person:'김응석',pri:'상',s:'2026-06-05',e:'2026-06-08'},
+  {id:5, cat:'기획',sub:'문서',   task:'메뉴트리 작성',             detail:'HPDFS v2 주요 화면 및 기능을 기준으로 전체 메뉴 구조 계층화',                           person:'홍제규',pri:'상',s:'2026-06-05',e:'2026-06-08'},
+  {id:6, cat:'기획',sub:'문서',   task:'사용자 시나리오 작성',      detail:'Agent 실행부터 SMART 수집, 서버 전송, 진단 결과 확인까지의 이용 흐름',                  person:'홍제규',pri:'상',s:'2026-06-05',e:'2026-06-08'},
+  {id:7, cat:'기획',sub:'문서',   task:'테이블 정의서 작성',        detail:'disks, diagnosis_logs 등 주요 DB 테이블 컬럼·타입·제약조건 정리',                       person:'장영재',pri:'상',s:'2026-06-05',e:'2026-06-08'},
+  {id:8, cat:'기획',sub:'문서',   task:'ERD 작성',                  detail:'디스크 정보와 진단 이력 간의 1:N 관계를 중심으로 DB 구조도 작성',                       person:'장영재',pri:'상',s:'2026-06-05',e:'2026-06-08'},
+  {id:9, cat:'설계',sub:'아키텍처',task:'시스템 구조 설계',         detail:'Agent, FastAPI Backend, PostgreSQL, Streamlit Dashboard 구조 설계',                     person:'공통',  pri:'상',s:'2026-06-05',e:'2026-06-08'},
+  {id:10,cat:'설계',sub:'데이터흐름',task:'데이터 흐름 설계',       detail:'smartctl 수집 → API 전송 → ML 예측 → DB 저장 → 대시보드 조회 흐름 정의',              person:'공통',  pri:'상',s:'2026-06-05',e:'2026-06-08'},
+  {id:11,cat:'모델',sub:'데이터', task:'Backblaze 데이터셋 정리',   detail:'저장장치 SMART 데이터와 failure 라벨 기반 학습 데이터 구성',                            person:'김응석',pri:'상',s:'2026-06-08',e:'2026-06-08'},
+  {id:12,cat:'모델',sub:'전처리', task:'SMART 피처 선정',           detail:'model, capacity_bytes, smart_5/9/187/188/194/197/198/199 raw 값 선정',                  person:'김응석',pri:'상',s:'2026-06-08',e:'2026-06-08'},
+  {id:13,cat:'모델',sub:'학습',   task:'고장 예측 모델 학습',       detail:'GradientBoosting 기반 storage_best_model.pkl 모델 학습 및 저장',                        person:'김응석',pri:'상',s:'2026-06-08',e:'2026-06-09'},
+  {id:14,cat:'모델',sub:'평가',   task:'초기 성능 평가',            detail:'Accuracy, Precision, Recall, F1-score 기준 모델 성능 확인',                             person:'김응석',pri:'상',s:'2026-06-08',e:'2026-06-09'},
+  {id:15,cat:'모델',sub:'보정',   task:'SMART 규칙 기반 위험도 보정',detail:'재할당·대기·정정불가 섹터 등 핵심 SMART 지표 기반 보정 로직 작성',                    person:'김응석',pri:'상',s:'2026-06-09',e:'2026-06-10'},
+  {id:16,cat:'개발',sub:'Backend',task:'FastAPI 기본 구조 구현',    detail:'API 서버 실행 구조, 라우터, 모델 로딩 구조 작성',                                       person:'홍제규',pri:'상',s:'2026-06-09',e:'2026-06-10'},
+  {id:17,cat:'개발',sub:'Backend',task:'진단 API 구현',             detail:'SMART 입력값을 받아 고장 위험 확률과 최종 위험 등급 반환',                              person:'홍제규',pri:'상',s:'2026-06-10',e:'2026-06-11'},
+  {id:18,cat:'개발',sub:'DB',     task:'DB 모델 설계',              detail:'disks, diagnosis_logs 테이블 구조 설계',                                                 person:'홍제규',pri:'상',s:'2026-06-10',e:'2026-06-11'},
+  {id:19,cat:'개발',sub:'DB',     task:'PostgreSQL 연동',           detail:'진단 결과와 디스크 최신 상태 저장 기능 구현',                                           person:'홍제규',pri:'중',s:'2026-06-11',e:'2026-06-12'},
+  {id:20,cat:'개발',sub:'Agent',  task:'SMART 수집 Agent 구현',     detail:'smartctl --scan 및 -a -j 기반 로컬 저장장치 SMART 정보 수집',                           person:'안세웅',pri:'중',s:'2026-06-10',e:'2026-06-11'},
+  {id:21,cat:'개발',sub:'Agent',  task:'SMART JSON 파싱',           detail:'수집된 SMART JSON에서 모델 입력 피처 추출',                                             person:'안세웅',pri:'중',s:'2026-06-11',e:'2026-06-12'},
+  {id:22,cat:'개발',sub:'Agent',  task:'Backend 전송 기능 구현',    detail:'수집된 SMART 데이터를 Backend /api/diagnose로 전송',                                    person:'안세웅',pri:'상',s:'2026-06-12',e:'2026-06-15'},
+  {id:23,cat:'개발',sub:'Frontend',task:'대시보드 기본 화면 구현',  detail:'전체 디스크 수, 정상/주의/위험 요약 카드 구성',                                         person:'장영재',pri:'상',s:'2026-06-11',e:'2026-06-12'},
+  {id:24,cat:'개발',sub:'Frontend',task:'디스크 목록 화면 구현',    detail:'디스크 모델명, 용량, 위험도, 최근 진단 시간 표시',                                      person:'장영재',pri:'상',s:'2026-06-12',e:'2026-06-15'},
+  {id:25,cat:'개발',sub:'Frontend',task:'디스크 상세 화면 구현',    detail:'SMART 주요 지표, 위험 원인, 권장 조치 표시',                                            person:'장영재',pri:'중',s:'2026-06-12',e:'2026-06-15'},
+  {id:26,cat:'개발',sub:'Infra',  task:'Docker Compose 구성',       detail:'backend, frontend, postgresql, nginx 컨테이너 실행 구조 작성',                          person:'안세웅',pri:'중',s:'2026-06-12',e:'2026-06-15'},
+  {id:27,cat:'개발',sub:'Infra',  task:'Nginx 설정',                detail:'Frontend와 Backend 요청 프록시 설정',                                                   person:'안세웅',pri:'중',s:'2026-06-12',e:'2026-06-15'},
+  {id:28,cat:'개발',sub:'Infra',  task:'Kubernetes 배포 파일 작성', detail:'확장 배포를 위한 k8s manifest 작성',                                                    person:'안세웅',pri:'상',s:'2026-06-12',e:'2026-06-15'},
+  {id:29,cat:'테스트',sub:'단위', task:'예측 로직 테스트',          detail:'ML 예측 결과와 SMART 규칙 보정 결과 검증',                                              person:'이성룡',pri:'중',s:'2026-06-12',e:'2026-06-15'},
+  {id:30,cat:'테스트',sub:'통합', task:'Agent-Backend 연동 테스트', detail:'Agent 수집 데이터가 Backend로 전송되고 DB에 저장되는지 확인',                           person:'이성룡',pri:'중',s:'2026-06-12',e:'2026-06-15'},
+  {id:31,cat:'테스트',sub:'통합', task:'Frontend-Backend 연동 테스트',detail:'대시보드에서 API 데이터를 정상 조회하는지 확인',                                      person:'이성룡',pri:'중',s:'2026-06-12',e:'2026-06-15'},
+  {id:32,cat:'테스트',sub:'시연', task:'데모 데이터 및 시나리오 준비',detail:'정상/주의/위험 디스크 예시 데이터 기반 시연 흐름 구성',                               person:'이성룡',pri:'상',s:'2026-06-15',e:'2026-06-15'},
+  {id:33,cat:'문서',sub:'문서화', task:'README 및 실행 방법 정리',  detail:'Docker 실행, Agent 실행, 대시보드 접속 방법 작성',                                      person:'공통',  pri:'상',s:'2026-06-15',e:'2026-06-15'},
+  {id:34,cat:'발표',sub:'발표자료',task:'스토리보드 작성',          detail:'대시보드·디스크 목록·상세·진단 이력 등 주요 화면 구성 요소와 전환 흐름 정리',           person:'안세웅',pri:'상',s:'2026-06-15',e:'2026-06-16'},
+  {id:35,cat:'발표',sub:'발표자료',task:'발표 PPT 작성',            detail:'프로젝트 개요, 문제점, 아키텍처, 모델, 시연 화면 정리',                                 person:'공통',  pri:'상',s:'2026-06-15',e:'2026-06-16'},
+  {id:36,cat:'발표',sub:'시연',   task:'최종 발표 리허설',          detail:'프로그램 실행, API 연동, 대시보드 시연, 질의응답 준비',                                 person:'이성룡',pri:'상',s:'2026-06-16',e:'2026-06-16'},
+];
+
+/* ── 카테고리 색상 ────────────────────────────────────── */
+const cats = {
+  '기획':  {bg:'#0d1825',txt:'#58a6ff',brd:'#1f6feb',bar:'#1f6feb'},
+  '설계':  {bg:'#0d1f10',txt:'#56d364',brd:'#2ea043',bar:'#2ea043'},
+  '모델':  {bg:'#1f1a00',txt:'#d29922',brd:'#9a6700',bar:'#b07800'},
+  '개발':  {bg:'#0d2318',txt:'#3fb950',brd:'#388e3c',bar:'#2ea043'},
+  '테스트':{bg:'#2d1010',txt:'#f85149',brd:'#6b2020',bar:'#da3633'},
+  '문서':  {bg:'#1a0d2e',txt:'#d2a8ff',brd:'#6f42c1',bar:'#8957e5'},
+  '발표':  {bg:'#1f1a00',txt:'#ffd700',brd:'#b8860b',bar:'#c9920a'},
+};
+
+/* ── 담당자 색상 ──────────────────────────────────────── */
+const persons = {
+  '공통':  {bg:'#21262d',txt:'#8b949e'},
+  '김응석':{bg:'#0d1825',txt:'#58a6ff'},
+  '홍제규':{bg:'#0d2318',txt:'#3fb950'},
+  '장영재':{bg:'#1a0d2e',txt:'#d2a8ff'},
+  '안세웅':{bg:'#2a1500',txt:'#f0a040'},
+  '이성룡':{bg:'#2d1010',txt:'#f85149'},
+};
+
+/* ── 간트 타임라인 세팅 ───────────────────────────────── */
+const GANTT_START = new Date('2026-06-04');
+const TOTAL_DAYS  = 13;
+const DAY_LABELS  = ['목','금','토','일','월','화','수','목','금','토','일','월','화'];
+const IS_WEEKEND  = [false,false,true,true,false,false,false,false,false,true,true,false,false];
+const TODAY_IDX   = 11; // Jun 15
+
+function dayIdx(dateStr) {
+  return Math.round((new Date(dateStr) - GANTT_START) / 86400000);
+}
+
+/* ── 장면 전환 ────────────────────────────────────────── */
+function show(id, btn) {
+  document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+/* ── 필터 ─────────────────────────────────────────────── */
+let activeCat = 'all';
+
+function renderFilters() {
+  const el = document.getElementById('filters');
+  const list = ['all', ...Object.keys(cats)];
+  el.innerHTML = list.map(c => {
+    const isAll = c === 'all';
+    const col   = cats[c];
+    const cnt   = isAll ? tasks.length : tasks.filter(t => t.cat === c).length;
+    const style = isAll
+      ? '' : `border-color:${col.brd};color:${col.txt};`;
+    const active = activeCat === c ? 'f-active' : '';
+    const cls    = isAll ? 'f-all' : '';
+    return `<button class="filter-btn ${cls} ${active}" style="${style}" onclick="setFilter('${c}')">`
+         + `${isAll ? '전체' : c} <span style="opacity:.55">(${cnt})</span></button>`;
+  }).join('');
+}
+
+function setFilter(cat) { activeCat = cat; renderFilters(); renderTable(); }
+
+/* ── WBS 테이블 렌더 ─────────────────────────────────── */
+function renderTable() {
+  const rows = activeCat === 'all' ? tasks : tasks.filter(t => t.cat === activeCat);
+  document.getElementById('wbs-body').innerHTML = rows.map(t => {
+    const c = cats[t.cat];
+    const p = persons[t.person] || {bg:'#21262d',txt:'#8b949e'};
+    const priCls = t.pri === '상' ? 'pri-h' : t.pri === '중' ? 'pri-m' : '';
+    return `<tr>
+      <td style="color:#6e7681;font-size:11px;text-align:center">${t.id}</td>
+      <td><span class="cat-badge" style="background:${c.bg};color:${c.txt};border-color:${c.brd}">${t.cat}</span></td>
+      <td style="font-size:11px;color:#6e7681">${t.sub}</td>
+      <td><div class="task-name">${t.task}</div><div class="task-detail">${t.detail}</div></td>
+      <td><span class="person-badge" style="background:${p.bg};color:${p.txt}">${t.person}</span></td>
+      <td><span class="status-done">완료</span></td>
+      <td style="text-align:center"><span class="${priCls}" style="font-size:11px">${t.pri}</span></td>
+      <td style="font-size:10.5px;font-family:'Consolas',monospace;color:#6e7681;white-space:nowrap">${t.s.slice(5)} ~ ${t.e.slice(5)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── 간트 차트 렌더 ──────────────────────────────────── */
+function renderGantt() {
+  /* 날짜 헤더 */
+  document.getElementById('gantt-dates').innerHTML =
+    Array.from({length: TOTAL_DAYS}, (_, i) => {
+      const cls = IS_WEEKEND[i] ? 'weekend' : i === TODAY_IDX ? 'today-d' : '';
+      return `<div class="gantt-day-col ${cls}">
+        <div class="gantt-day-num">${4 + i}</div>
+        <div class="gantt-day-name">${DAY_LABELS[i]}</div>
+      </div>`;
+    }).join('');
+
+  /* 배경 열 프리컴파일 */
+  const bgCols = Array.from({length: TOTAL_DAYS}, (_, i) => {
+    const cls = IS_WEEKEND[i] ? 'weekend' : i === TODAY_IDX ? 'today-line' : '';
+    if (!cls) return '';
+    const l = (i / TOTAL_DAYS * 100).toFixed(4);
+    const w = (1 / TOTAL_DAYS * 100).toFixed(4);
+    return `<div class="g-bg ${cls}" style="left:${l}%;width:${w}%"></div>`;
+  }).join('');
+
+  /* 행 렌더 */
+  let html = '';
+  let prevCat = null;
+  tasks.forEach(t => {
+    const c = cats[t.cat];
+    const p = persons[t.person] || {bg:'#21262d',txt:'#8b949e'};
+    if (t.cat !== prevCat) {
+      html += `<div class="gantt-cat-sep">
+        <div class="gantt-cat-label" style="color:${c.txt}">
+          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${c.bar};flex-shrink:0"></span>
+          ${t.cat}
+        </div>
+        <div class="gantt-cat-bg"></div>
+      </div>`;
+      prevCat = t.cat;
+    }
+    const si = dayIdx(t.s), ei = dayIdx(t.e);
+    const left  = (si / TOTAL_DAYS * 100).toFixed(4);
+    const width = ((ei - si + 1) / TOTAL_DAYS * 100).toFixed(4);
+    const label = parseFloat(width) > 12 ? `${t.s.slice(8)}~${t.e.slice(8)}` : '';
+    html += `<div class="gantt-row">
+      <div class="gantt-info">
+        <div class="gantt-task">${t.task}</div>
+        <div class="gantt-meta">
+          <span class="gantt-person" style="background:${p.bg};color:${p.txt}">${t.person}</span>
+          <span class="gantt-sub">${t.sub}</span>
+        </div>
+      </div>
+      <div class="gantt-timeline">
+        ${bgCols}
+        <div class="gantt-bar" style="left:calc(${left}% + 2px);width:calc(${width}% - 4px);background:${c.bar}">${label}</div>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('gantt-body').innerHTML = html;
+}
+
+/* ── 초기화 ───────────────────────────────────────────── */
+renderFilters();
+renderTable();
+renderGantt();
+</script>
+</body>
+</html>

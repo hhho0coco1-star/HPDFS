@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HPDFS 메뉴 트리 & 사용자 시나리오</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0d1117; height: 100vh; overflow: hidden;
+}
+.wrap {
+  display: flex; flex-direction: column;
+  height: 100vh; padding: 12px 18px; gap: 10px;
+}
+
+/* ── 헤더 ── */
+.head {
+  display: flex; align-items: center;
+  justify-content: space-between; flex-shrink: 0;
+}
+.title { font-size: 17px; font-weight: 900; color: #e6edf3; }
+.subtitle { font-size: 11px; color: #8b949e; margin-top: 2px; }
+.nav { display: flex; gap: 5px; }
+.nav-btn {
+  font-size: 11px; font-weight: 700;
+  padding: 5px 14px; border-radius: 20px;
+  border: 1.5px solid #30363d;
+  background: #161b22; color: #8b949e; cursor: pointer;
+  transition: all .15s; white-space: nowrap;
+}
+.nav-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+.nav-btn.active { background: #1f6feb; color: #fff; border-color: #1f6feb; }
+
+/* ── 장면 ── */
+.scene { display: none; flex: 1; min-height: 0; flex-direction: column; gap: 9px; }
+.scene.active { display: flex; }
+
+/* ══════════════════════════════════
+   S1 — 메뉴 트리
+══════════════════════════════════ */
+.tree-wrap {
+  flex: 1; min-height: 0; overflow-y: auto;
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+  padding: 18px 0;
+}
+.tree-wrap::-webkit-scrollbar { width: 3px; }
+.tree-wrap::-webkit-scrollbar-thumb { background: #30363d; border-radius: 2px; }
+
+/* 루트 노드 */
+.tree-root {
+  display: flex; justify-content: center;
+  position: relative;
+}
+.root-node {
+  background: #1f6feb; border: 2px solid #388bfd;
+  border-radius: 10px; padding: 10px 28px;
+  font-size: 15px; font-weight: 900; color: #fff;
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 4px 20px rgba(31,111,235,.35);
+}
+/* 루트 → 수평선 연결 수직선 */
+.root-v-line {
+  width: 2px; height: 28px; background: #30363d; margin: 0 auto;
+}
+
+/* 수평 연결선 */
+.tree-h-connector {
+  position: relative; width: 100%; display: flex; justify-content: center;
+}
+.h-line {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; background: #30363d;
+}
+
+/* 브랜치 행 */
+.branches-row {
+  display: flex; gap: 8px; width: 100%;
+  position: relative; padding-top: 0;
+}
+
+/* 개별 브랜치 */
+.branch {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; min-width: 0;
+}
+.branch-v-line {
+  width: 2px; height: 28px; background: #30363d;
+}
+
+/* 브랜치 헤더 */
+.branch-head {
+  width: 100%; border-radius: 8px;
+  padding: 13px 10px;
+  text-align: center; font-size: 12px; font-weight: 800;
+  border: 2px solid; cursor: default;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bh-blue   { background: #0d1825; color: #58a6ff;  border-color: #1f6feb; }
+.bh-green  { background: #0d2318; color: #3fb950;  border-color: #388e3c; }
+.bh-orange { background: #2a1500; color: #f0a040;  border-color: #b7530a; }
+.bh-purple { background: #1a0d2e; color: #d2a8ff;  border-color: #6f42c1; }
+.bh-navy   { background: #0d1825; color: #79c0ff;  border-color: #1f6feb; }
+.bh-gold   { background: #1f1a00; color: #ffd700;  border-color: #b8860b; }
+.bh-gray   { background: #161b22; color: #8b949e;  border-color: #30363d; }
+
+/* 브랜치 아이템 */
+.branch-items {
+  width: 100%; display: flex; flex-direction: column;
+  gap: 7px; margin-top: 10px;
+}
+.b-item {
+  background: #161b22; border: 1px solid #21262d;
+  border-radius: 6px; padding: 11px 10px;
+  font-size: 11px; color: #8b949e; line-height: 1.4;
+  text-align: center;
+}
+.b-item:hover { background: #1c2128; color: #c9d1d9; }
+
+/* 서브 아이템 (들여쓰기 있는) */
+.b-sub-group {
+  width: 100%; background: #0d1117; border: 1px solid #21262d;
+  border-radius: 6px; padding: 10px 10px;
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: 4px;
+}
+.b-sub-label {
+  font-size: 10px; color: #6e7681; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .3px;
+  padding-bottom: 6px; border-bottom: 1px solid #21262d;
+  margin-bottom: 2px;
+}
+.b-sub {
+  font-size: 10.5px; color: #6e7681; padding: 4px 4px;
+  display: flex; align-items: center; gap: 5px;
+}
+.b-sub::before { content: '•'; color: #30363d; }
+.b-sub:hover { color: #8b949e; }
+
+/* 컬럼 설명 리스트 */
+.col-list {
+  width: 100%; background: #0d1117; border: 1px solid #21262d;
+  border-radius: 6px; padding: 10px 10px;
+  display: flex; flex-direction: column; gap: 5px; margin-top: 4px;
+}
+.col-item {
+  font-size: 10.5px; color: #6e7681;
+  font-family: "Consolas", monospace;
+  padding: 4px 4px;
+}
+.col-item:hover { color: #79c0ff; }
+
+/* 데모 ON/OFF */
+.demo-on  { border-left: 3px solid #3fb950 !important; color: #3fb950 !important; }
+.demo-off { border-left: 3px solid #f85149 !important; color: #f85149 !important; }
+
+/* ══════════════════════════════════
+   S2 — 사용자 시나리오
+══════════════════════════════════ */
+.sc-wrap {
+  flex: 1; min-height: 0; overflow: hidden;
+  display: flex; flex-direction: column;
+  background: #161b22; border-radius: 10px;
+  border: 1px solid #30363d;
+}
+
+/* 헤더 행 */
+.sc-header {
+  display: flex; flex-shrink: 0;
+  background: #0d1117; border-bottom: 2px solid #21262d;
+  border-radius: 10px 10px 0 0;
+  border-left: 3px solid transparent;
+}
+.sc-hcell {
+  padding: 9px 14px;
+  font-size: 10px; font-weight: 800; letter-spacing: .4px;
+  color: #6e7681; text-transform: uppercase;
+}
+.sc-hcell.hl  { width: 24%; border-right: 1px solid #21262d; }
+/* 오른쪽 헤더 셀들은 sc-hright 안에서 sc-right와 동일한 기준으로 배치 */
+.sc-hright { flex: 1; display: flex; align-items: stretch; }
+.sc-hcell.hw  { width: 8%; border-right: 1px solid #21262d; }
+.sc-hcell.hwt { flex: 1.4; border-right: 1px solid #21262d; }
+.sc-hcell.hwn { width: 9%; border-right: 1px solid #21262d; }
+.sc-hcell.hy  { flex: 1.6; border-right: 1px solid #21262d; }
+.sc-hcell.hh  { flex: 1.5; border-right: 1px solid #21262d; }
+.sc-hcell.hr  { flex: 1.5; }
+
+/* 카드 리스트 */
+.sc-list {
+  flex: 1; min-height: 0; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+
+/* 개별 카드 */
+.sc-card {
+  flex: 1; display: flex; align-items: stretch;
+  border-bottom: 1px solid #1c2128; min-height: 0;
+  transition: background .1s;
+}
+.sc-card:last-child { border-bottom: none; }
+.sc-card:hover { background: #1c2128; }
+
+/* 왼쪽 패널: 번호 + 제목 + where 뱃지 */
+.sc-left {
+  width: 24%; padding: 12px 14px;
+  display: flex; flex-direction: column; justify-content: center; gap: 7px;
+  border-right: 1px solid #21262d;
+}
+.sc-num-row { display: flex; align-items: center; gap: 9px; }
+.sc-num {
+  width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 900;
+}
+.num-1 { background: #0d2318; color: #3fb950; border: 2px solid #388e3c; }
+.num-2 { background: #2a1500; color: #f0a040; border: 2px solid #b7530a; }
+.num-3 { background: #0d1825; color: #58a6ff; border: 2px solid #1f6feb; }
+.num-4 { background: #1a0d2e; color: #d2a8ff; border: 2px solid #6f42c1; }
+.num-5 { background: #2d1010; color: #f85149; border: 2px solid #6b2020; }
+.num-6 { background: #0d1825; color: #79c0ff; border: 2px solid #1d3a6e; }
+
+.sc-title { font-size: 12px; font-weight: 700; color: #c9d1d9; line-height: 1.45; }
+.where-badge {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 10px; align-self: flex-start;
+  background: #1c2128; color: #6e7681;
+  border: 1px solid #30363d; white-space: nowrap;
+}
+
+/* 오른쪽: 정보 컬럼들 */
+.sc-right { flex: 1; display: flex; align-items: stretch; }
+.sc-col {
+  flex: 1; padding: 12px 14px;
+  display: flex; flex-direction: column; justify-content: center; gap: 4px;
+  border-right: 1px solid #0d1117;
+}
+.sc-col:last-child { border-right: none; }
+.sc-col.cw  { width: 8%; flex: none; }
+.sc-col.cwt { flex: 1.4; }
+.sc-col.cwn { width: 9%; flex: none; }
+.sc-col.cy  { flex: 1.6; }
+.sc-col.ch  { flex: 1.5; }
+.sc-col.cr  { flex: 1.5; }
+
+.col-label {
+  font-size: 9px; font-weight: 800; color: #484f58;
+  text-transform: uppercase; letter-spacing: .4px;
+}
+.col-val {
+  font-size: 11.5px; color: #8b949e; line-height: 1.5;
+}
+.col-flow {
+  font-size: 10.5px; color: #6e7681;
+  font-family: "Consolas", monospace; line-height: 1.7;
+}
+
+/* 번호별 왼쪽 강조 보더 */
+.sc-card.c1 { border-left: 3px solid #388e3c; }
+.sc-card.c2 { border-left: 3px solid #b7530a; }
+.sc-card.c3 { border-left: 3px solid #1f6feb; }
+.sc-card.c4 { border-left: 3px solid #6f42c1; }
+.sc-card.c5 { border-left: 3px solid #6b2020; }
+.sc-card.c6 { border-left: 3px solid #1d3a6e; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 헤더 -->
+  <div class="head">
+    <div>
+      <div class="title">🗺️ HPDFS 메뉴 구조 & 사용자 시나리오</div>
+      <div class="subtitle">Menu Tree & User Scenarios · Predictive Drive Failure System</div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn active" onclick="show('S1',this)">📂 메뉴 트리</button>
+      <button class="nav-btn" onclick="show('S2',this)">👤 사용자 시나리오</button>
+    </div>
+  </div>
+
+  <!-- ══ S1 메뉴 트리 ══ -->
+  <div id="S1" class="scene active">
+    <div class="tree-wrap">
+
+      <!-- 루트 -->
+      <div class="tree-root">
+        <div class="root-node">🖥️ &nbsp;PDFS</div>
+      </div>
+      <div class="root-v-line"></div>
+
+      <!-- 수평선 + 브랜치 -->
+      <div style="width:100%;position:relative;">
+        <div style="position:absolute;top:0;left:calc(100%/14);right:calc(100%/14);height:2px;background:#30363d;"></div>
+        <div class="branches-row">
+
+          <!-- 대시보드 -->
+          <div class="branch">
+            <div class="branch-v-line"></div>
+            <div class="branch-head bh-blue">📊 대시보드</div>
+            <div class="branch-items">
+              <div class="b-item">전체 현황</div>
+              <div class="b-item">시스템 분석</div>
+              <div class="b-item">주의가 필요한 디스크</div>
+              <div class="b-item">전체 디스크 목록</div>
+              <div class="b-item">위험 알림</div>
+            </div>
+          </div>
+
+          <!-- 자동진단 -->
+          <div class="branch">
+            <div class="branch-v-line"></div>
+            <div class="branch-head bh-green">🤖 자동진단</div>
+            <div class="branch-items">
+              <div class="b-item">에이전트 방식 안내</div>
+              <div class="b-item">start_agent.bat 실행 안내</div>
+              <div class="b-item">5분 간격 SMART 수집 및 서버 전송 안내</div>
+              <div class="b-item">stop_agent.bat 종료 안내</div>
+            </div>
+          </div>
+
+          <!-- 수동진단 -->
+          <div class="branch">
+            <div class="branch-v-line"></div>
+            <div class="branch-head bh-orange">✏️ 수동진단</div>
+            <div class="branch-items">
+              <div class="b-item">입력 폼 (SMART 값 입력)</div>
+              <div class="b-item">수동 진단 실행</div>
+              <div class="b-sub-group">
+                <div class="b-sub-label">진단 결과</div>
+                <div class="b-sub">고장 위험도 게이지</div>
+                <div class="b-sub">ML 예측 등급</div>
+                <div class="b-sub">규칙 기반 등급</div>
+                <div class="b-sub">최종 등급</div>
+                <div class="b-sub">진단 원인</div>
+                <div class="b-sub">권장 조치</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 디스크 상세 -->
+          <div class="branch">
+            <div class="branch-v-line"></div>
+            <div class="branch-head bh-purple">💽 디스크 상세</div>
+            <div class="branch-items">
+              <div class="b-item">디스크 선택</div>
+              <div class="b-item">디스크 기본 정보</div>
+              <div class="b-item">조치 상태 관리</div>
+              <div class="b-item">예측 결과 (위험도 게이지)</div>
+              <div class="b-item">최근 진단 이력</div>
+            </div>
+          </div>
+
+          <!-- 컬럼 설명 -->
+          <div class="branch">
+            <div class="branch-v-line"></div>
+            <div class="branch-head bh-navy">📖 컬럼 설명</div>
+            <div class="branch-items">
+              <div class="b-item" style="font-size:10.5px;color:#6e7681;">SMART 컬럼별 의미 설명</div>
+              <div class="col-list">
+                <div class="col-item">model</div>
+                <div class="col-item">capacity_bytes</div>
+                <div class="col-item">smart_5_raw</div>
+                <div class="col-item">smart_9_raw</div>
+                <div class="col-item">smart_187_raw</div>
+                <div class="col-item">smart_188_raw</div>
+                <div class="col-item">smart_194_raw</div>
+                <div class="col-item">smart_197_raw</div>
+                <div class="col-item">smart_198_raw</div>
+                <div class="col-item">smart_199_raw</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 데모 모드 토글 -->
+          <div class="branch">
+            <div class="branch-v-line"></div>
+            <div class="branch-head bh-gold">🌙 데모 모드 토글</div>
+            <div class="branch-items">
+              <div class="b-item demo-on">ON: 발표용 더미 디스크 데이터 주입</div>
+              <div class="b-item demo-off">OFF: 발표용 더미 디스크 데이터 삭제</div>
+            </div>
+          </div>
+
+          <!-- API URL 표시 -->
+          <div class="branch">
+            <div class="branch-v-line"></div>
+            <div class="branch-head bh-gray">🔗 API URL 표시</div>
+            <div class="branch-items">
+              <div class="b-item">현재 API 기본 URL 표시</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ S2 사용자 시나리오 ══ -->
+  <div id="S2" class="scene">
+    <div class="sc-wrap">
+
+      <!-- 헤더 -->
+      <div class="sc-header">
+        <div class="sc-hcell hl">No. &nbsp;/&nbsp; 시나리오</div>
+        <div class="sc-hright">
+          <div class="sc-hcell hw">Who</div>
+          <div class="sc-hcell hwt">What</div>
+          <div class="sc-hcell hwn">When</div>
+          <div class="sc-hcell hy">Why</div>
+          <div class="sc-hcell hh">How</div>
+          <div class="sc-hcell hr">결과</div>
+        </div>
+      </div>
+
+      <!-- 카드 리스트 -->
+      <div class="sc-list">
+
+        <!-- 1 -->
+        <div class="sc-card c1">
+          <div class="sc-left">
+            <div class="sc-num-row">
+              <div class="sc-num num-1">1</div>
+              <div class="sc-title">운영자가 전체 디스크 상태를 확인한다</div>
+            </div>
+            <span class="where-badge">📊 대시보드</span>
+          </div>
+          <div class="sc-right">
+            <div class="sc-col cw"><div class="col-label">Who</div><div class="col-val">운영자</div></div>
+            <div class="sc-col cwt"><div class="col-label">What</div><div class="col-val">전체 디스크의 정상/주의/위험 상태를 확인</div></div>
+            <div class="sc-col cwn"><div class="col-label">When</div><div class="col-val">시스템 점검 시</div></div>
+            <div class="sc-col cy"><div class="col-label">Why</div><div class="col-val">위험 디스크를 빠르게 식별하고 우선순위를 정하기 위해</div></div>
+            <div class="sc-col ch"><div class="col-label">How</div><div class="col-flow">접속 → 데이터 조회 → 현황 분석 → 위험 알림 확인</div></div>
+            <div class="sc-col cr"><div class="col-label">결과</div><div class="col-val">위험 디스크의 우선 조치 대상을 판단할 수 있다.</div></div>
+          </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="sc-card c2">
+          <div class="sc-left">
+            <div class="sc-num-row">
+              <div class="sc-num num-2">2</div>
+              <div class="sc-title">발표자가 데모 데이터를 켜서 시연한다</div>
+            </div>
+            <span class="where-badge">🌙 데모 모드 토글</span>
+          </div>
+          <div class="sc-right">
+            <div class="sc-col cw"><div class="col-label">Who</div><div class="col-val">발표자</div></div>
+            <div class="sc-col cwt"><div class="col-label">What</div><div class="col-val">데모 데이터를 주입/삭제하여 시연 환경을 준비</div></div>
+            <div class="sc-col cwn"><div class="col-label">When</div><div class="col-val">발표 준비 및 시연 중</div></div>
+            <div class="sc-col cy"><div class="col-label">Why</div><div class="col-val">실제 디스크 데이터 없이 시스템 기능을 시연하기 위해</div></div>
+            <div class="sc-col ch"><div class="col-label">How</div><div class="col-flow">데모 모드 ON → 더미 데이터 주입 / OFF → 데이터 삭제</div></div>
+            <div class="sc-col cr"><div class="col-label">결과</div><div class="col-val">대시보드·알림·상세 화면을 시연 환경에서 확인할 수 있다.</div></div>
+          </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="sc-card c3">
+          <div class="sc-left">
+            <div class="sc-num-row">
+              <div class="sc-num num-3">3</div>
+              <div class="sc-title">에이전트가 자동으로 디스크를 진단한다</div>
+            </div>
+            <span class="where-badge">🤖 자동진단 (에이전트)</span>
+          </div>
+          <div class="sc-right">
+            <div class="sc-col cw"><div class="col-label">Who</div><div class="col-val">운영자</div></div>
+            <div class="sc-col cwt"><div class="col-label">What</div><div class="col-val">로컬 PC의 SMART 데이터를 수집하고 서버에 전송</div></div>
+            <div class="sc-col cwn"><div class="col-label">When</div><div class="col-val">에이전트 실행 후 5분 간격</div></div>
+            <div class="sc-col cy"><div class="col-label">Why</div><div class="col-val">디스크 상태를 지속적으로 모니터링하기 위해</div></div>
+            <div class="sc-col ch"><div class="col-label">How</div><div class="col-flow">에이전트 실행 → SMART 수집 → API 전송 → 진단/저장 → 반복</div></div>
+            <div class="sc-col cr"><div class="col-label">결과</div><div class="col-val">대시보드와 디스크 상세에서 자동 진단 결과를 조회할 수 있다.</div></div>
+          </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="sc-card c4">
+          <div class="sc-left">
+            <div class="sc-num-row">
+              <div class="sc-num num-4">4</div>
+              <div class="sc-title">사용자가 SMART 값을 직접 입력해 수동진단한다</div>
+            </div>
+            <span class="where-badge">✏️ 수동진단</span>
+          </div>
+          <div class="sc-right">
+            <div class="sc-col cw"><div class="col-label">Who</div><div class="col-val">운영자 / 발표자 / 개발자</div></div>
+            <div class="sc-col cwt"><div class="col-label">What</div><div class="col-val">SMART 값을 입력하여 즉시 진단 결과 확인</div></div>
+            <div class="sc-col cwn"><div class="col-label">When</div><div class="col-val">필요할 때 (즉시)</div></div>
+            <div class="sc-col cy"><div class="col-label">Why</div><div class="col-val">특정 SMART 값 조합의 위험도를 즉시 확인하기 위해</div></div>
+            <div class="sc-col ch"><div class="col-label">How</div><div class="col-flow">값 입력 → 진단 실행 → 결과 확인 (게이지, 등급, 원인, 조치)</div></div>
+            <div class="sc-col cr"><div class="col-label">결과</div><div class="col-val">입력한 SMART 값에 대한 고장 위험도를 즉시 확인할 수 있다.</div></div>
+          </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="sc-card c5">
+          <div class="sc-left">
+            <div class="sc-num-row">
+              <div class="sc-num num-5">5</div>
+              <div class="sc-title">운영자가 위험 디스크의 조치 상태를 변경한다</div>
+            </div>
+            <span class="where-badge">💽 디스크 상세</span>
+          </div>
+          <div class="sc-right">
+            <div class="sc-col cw"><div class="col-label">Who</div><div class="col-val">운영자</div></div>
+            <div class="sc-col cwt"><div class="col-label">What</div><div class="col-val">위험/주의 디스크의 조치 상태를 관리</div></div>
+            <div class="sc-col cwn"><div class="col-label">When</div><div class="col-val">위험 디스크 확인 후</div></div>
+            <div class="sc-col cy"><div class="col-label">Why</div><div class="col-val">대응 진행 상태를 체계적으로 관리하기 위해</div></div>
+            <div class="sc-col ch"><div class="col-label">How</div><div class="col-flow">디스크 선택 → 상태 변경 → 저장 (PATCH)</div></div>
+            <div class="sc-col cr"><div class="col-label">결과</div><div class="col-val">조치 진행 상황이 시스템에 반영되고 이력이 관리된다.</div></div>
+          </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="sc-card c6">
+          <div class="sc-left">
+            <div class="sc-num-row">
+              <div class="sc-num num-6">6</div>
+              <div class="sc-title">사용자가 SMART 컬럼 의미를 확인한다</div>
+            </div>
+            <span class="where-badge">📖 컬럼 설명</span>
+          </div>
+          <div class="sc-right">
+            <div class="sc-col cw"><div class="col-label">Who</div><div class="col-val">운영자 / 발표자 / 개발자</div></div>
+            <div class="sc-col cwt"><div class="col-label">What</div><div class="col-val">SMART 컬럼의 의미와 해석 방법을 확인</div></div>
+            <div class="sc-col cwn"><div class="col-label">When</div><div class="col-val">필요할 때</div></div>
+            <div class="sc-col cy"><div class="col-label">Why</div><div class="col-val">SMART 지표를 정확히 이해하고 해석하기 위해</div></div>
+            <div class="sc-col ch"><div class="col-label">How</div><div class="col-flow">컬럼 설명 페이지 → 항목별 의미 및 설명 확인</div></div>
+            <div class="sc-col cr"><div class="col-label">결과</div><div class="col-val">SMART 지표를 이해하고 진단 결과를 올바르게 해석할 수 있다.</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+</body>
+</html>
