@@ -303,9 +303,10 @@ def get_disks() -> list[dict[str, Any]]:
         return []
 
 
-def get_current_disks() -> list[dict[str, Any]]:
+def get_current_disks(agent_id: str | None = None) -> list[dict[str, Any]]:
     try:
-        res = requests.get(f"{API_URL}/api/disks/current", timeout=5)
+        params = {"agent_id": agent_id} if agent_id else None
+        res = requests.get(f"{API_URL}/api/disks/current", params=params, timeout=5)
         res.raise_for_status()
         return res.json()
     except requests.exceptions.ConnectionError:
@@ -369,6 +370,20 @@ def clear_demo() -> bool:
     except Exception as e:
         st.error(f"데모 데이터 삭제 실패: {e}")
         return False
+
+
+def get_query_agent_id() -> str:
+    try:
+        value = st.query_params.get("agent_id", "")
+        if isinstance(value, list):
+            return str(value[0]).strip() if value else ""
+        return str(value).strip()
+    except Exception:
+        try:
+            values = st.experimental_get_query_params().get("agent_id", [""])
+            return str(values[0]).strip() if values else ""
+        except Exception:
+            return ""
 
 
 def update_action_status(serial: str, action_status: str) -> bool:
@@ -734,10 +749,19 @@ render_header()
 
 if "demo_active" not in st.session_state:
     st.session_state.demo_active = get_demo_status()
+if "agent_id_filter" not in st.session_state:
+    st.session_state.agent_id_filter = get_query_agent_id()
 
 with st.sidebar:
     st.title("PDFS")
     page = st.radio("화면", ["대시보드", "자동진단", "수동진단", "디스크 상세", "컬럼 설명"])
+    st.divider()
+    st.text_input(
+        "Agent ID",
+        key="agent_id_filter",
+        help="Agent 실행창에 표시되는 Agent ID를 입력하면 해당 PC의 최신 진단만 상단 현황에 표시합니다.",
+    )
+    st.caption("비워두면 전체 Agent 중 가장 최근 진단을 기준으로 표시합니다.")
     st.divider()
     demo_mode = st.toggle("데모 모드", value=st.session_state.demo_active)
     if demo_mode != st.session_state.demo_active:
@@ -751,7 +775,8 @@ with st.sidebar:
 
 # ─── 대시보드 ───────────────────────────────────────────
 if page == "대시보드":
-    current_disks = get_current_disks()
+    agent_id_filter = st.session_state.get("agent_id_filter", "").strip()
+    current_disks = get_current_disks(agent_id_filter) if agent_id_filter else []
     all_disks = get_disks()
 
     render_summary(current_disks)
@@ -761,7 +786,7 @@ if page == "대시보드":
         render_toast(current_disks)
     else:
         st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
-        st.info("현재 진단된 디스크 데이터가 없습니다. Agent를 실행하면 상단 현황에 반영됩니다.")
+        st.info("현재 진단된 디스크 데이터가 없습니다. Agent 실행창의 Agent ID를 확인하거나 Agent를 실행하면 상단 현황에 반영됩니다.")
 
     render_table(all_disks)
 
@@ -841,7 +866,7 @@ elif page == "디스크 상세":
         options = [f"{d['serial']} · {d['model']} · {d['final_level']}" for d in disks]
         chosen = st.selectbox("디스크 선택", options)
         idx = options.index(chosen)
-        render_detail_page(disks[idx]["serial"])
+        render_detail_page(disks[idx].get("disk_key", disks[idx]["serial"]))
 
 # ─── 컬럼 설명 ──────────────────────────────────────────
 elif page == "컬럼 설명":

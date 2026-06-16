@@ -2,12 +2,28 @@ from __future__ import annotations
 
 import time
 from datetime import datetime
+from pathlib import Path
 from uuid import uuid4
 
 import requests
 
 from config import API_URL, INTERVAL_MINUTES, REQUEST_TIMEOUT
 from smart_collector import extract_features, scan_devices
+
+
+AGENT_ID_PATH = Path(__file__).resolve().parent / "agent_id.txt"
+
+
+def get_agent_id() -> str:
+    """PC/Agent 단위로 유지되는 고유 ID를 가져오거나 새로 만든다."""
+    if AGENT_ID_PATH.exists():
+        agent_id = AGENT_ID_PATH.read_text(encoding="utf-8").strip()
+        if agent_id:
+            return agent_id
+
+    agent_id = uuid4().hex
+    AGENT_ID_PATH.write_text(agent_id, encoding="utf-8")
+    return agent_id
 
 
 def log(msg: str):
@@ -18,7 +34,10 @@ def collect_and_send():
     try:
         devices = scan_devices()
         log(f"디스크 {len(devices)}개 감지")
+        agent_id = get_agent_id()
         scan_id = datetime.now().strftime("%Y%m%d%H%M%S") + "-" + uuid4().hex[:8]
+        log(f"Agent ID: {agent_id}")
+        log(f"Dashboard: {API_URL}/?agent_id={agent_id}")
     except Exception as e:
         log(f"디스크 스캔 실패: {e}")
         return
@@ -29,6 +48,7 @@ def collect_and_send():
             df = extract_features(device)
             row = df.iloc[0].to_dict()
             payload = {
+                "agent_id":       agent_id,
                 "scan_id":        scan_id,
                 "serial":         str(row.get("serial", "UNKNOWN")),
                 "device":         device_str,

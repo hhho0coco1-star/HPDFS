@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -29,9 +29,20 @@ def demo_disks() -> list[dict]:
     ]
 
 
+def display_serial(serial: str | None) -> str:
+    if not serial:
+        return "UNKNOWN"
+    parts = serial.split("::")
+    if len(parts) >= 2:
+        return parts[1]
+    return serial
+
+
 def disk_to_dict(d: Disk) -> dict[str, Any]:
     return {
-        "serial":        d.serial,
+        "disk_key":      d.serial,
+        "serial":        display_serial(d.serial),
+        "agent_id":      d.agent_id,
         "model":         d.model,
         "capacity_bytes":d.capacity_bytes,
         "final_level":   d.final_level,
@@ -49,23 +60,24 @@ def get_disks(db: Session = Depends(get_db)) -> list[dict[str, Any]]:
 
 
 @router.get("/disks/current")
-def get_current_disks(db: Session = Depends(get_db)) -> list[dict[str, Any]]:
-    """가장 최근 Agent 수집 묶음에 포함된 디스크만 조회"""
-    latest = (
-        db.query(DiagnosisLog.scan_id)
-        .filter(DiagnosisLog.scan_id.isnot(None))
-        .order_by(DiagnosisLog.timestamp.desc())
-        .first()
-    )
-    if not latest or not latest[0]:
+def get_current_disks(
+    agent_id: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+) -> list[dict[str, Any]]:
+    """특정 Agent의 가장 최근 수집 묶음에 포함된 디스크만 조회"""
+    latest_query = db.query(DiagnosisLog).filter(DiagnosisLog.scan_id.isnot(None))
+    if agent_id:
+        latest_query = latest_query.filter(DiagnosisLog.agent_id == agent_id)
+
+    latest = latest_query.order_by(DiagnosisLog.timestamp.desc()).first()
+    if not latest or not latest.scan_id:
         return []
 
-    disks = (
-        db.query(Disk)
-        .filter(Disk.last_scan_id == latest[0])
-        .order_by(Disk.risk.desc())
-        .all()
-    )
+    disks_query = db.query(Disk).filter(Disk.last_scan_id == latest.scan_id)
+    if latest.agent_id:
+        disks_query = disks_query.filter(Disk.agent_id == latest.agent_id)
+
+    disks = disks_query.order_by(Disk.risk.desc()).all()
     return [disk_to_dict(d) for d in disks]
 
 
@@ -86,7 +98,8 @@ def get_disk_history(serial: str, db: Session = Depends(get_db)) -> dict[str, An
 
     return {
         "disk": {
-            "serial":        disk.serial,
+            "disk_key":      disk.serial,
+            "serial":        display_serial(disk.serial),
             "model":         disk.model,
             "final_level":   disk.final_level,
             "risk":          disk.risk,
@@ -140,6 +153,7 @@ def inject_demo(db: Session = Depends(get_db)) -> dict[str, Any]:
         if not disk:
             db.add(Disk(
                 serial         = d["serial"],
+                agent_id       = "DEMO",
                 model          = d["model"],
                 capacity_bytes = d["capacity_bytes"],
                 final_level    = d["final_level"],

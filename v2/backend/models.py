@@ -9,6 +9,7 @@ class DiagnosisLog(Base):
 
     id              = Column(Integer, primary_key=True, index=True)
     scan_id         = Column(String, index=True)
+    agent_id        = Column(String, index=True)
     timestamp       = Column(DateTime, default=datetime.now)
     serial          = Column(String, index=True)
     device          = Column(String)
@@ -33,6 +34,7 @@ class Disk(Base):
     __tablename__ = "disks"
 
     serial          = Column(String, primary_key=True, index=True)  # 디스크 고유 시리얼 넘버
+    agent_id        = Column(String, index=True)                       # 데이터를 보낸 Agent/PC 식별자
     device          = Column(String)                                  # 현재 연결 경로 (/dev/sda 등) 참고용
     model           = Column(String)
     capacity_bytes  = Column(BigInteger)

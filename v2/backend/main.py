@@ -13,14 +13,18 @@ from router_disks import router as disks_router
 
 
 def ensure_runtime_columns():
-    """Add lightweight runtime columns used to separate the latest scan batch."""
+    """Add lightweight runtime columns used to separate each agent and latest scan batch."""
     inspector = inspect(engine)
     with engine.begin() as conn:
         diagnosis_cols = {col["name"] for col in inspector.get_columns("diagnosis_log")}
         if "scan_id" not in diagnosis_cols:
             conn.execute(text("ALTER TABLE diagnosis_log ADD COLUMN scan_id VARCHAR"))
+        if "agent_id" not in diagnosis_cols:
+            conn.execute(text("ALTER TABLE diagnosis_log ADD COLUMN agent_id VARCHAR"))
 
         disk_cols = {col["name"] for col in inspector.get_columns("disks")}
+        if "agent_id" not in disk_cols:
+            conn.execute(text("ALTER TABLE disks ADD COLUMN agent_id VARCHAR"))
         if "last_scan_id" not in disk_cols:
             conn.execute(text("ALTER TABLE disks ADD COLUMN last_scan_id VARCHAR"))
 
