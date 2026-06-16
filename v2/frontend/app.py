@@ -317,6 +317,21 @@ def get_current_disks(agent_id: str | None = None) -> list[dict[str, Any]]:
         return []
 
 
+def clear_current_disks(agent_id: str | None = None) -> bool:
+    try:
+        params = {"agent_id": agent_id} if agent_id else None
+        res = requests.delete(f"{API_URL}/api/disks/current", params=params, timeout=5)
+        res.raise_for_status()
+        st.session_state.current_clear_message = res.json().get("message", "현재 진단이 초기화되었습니다.")
+        return True
+    except requests.exceptions.ConnectionError:
+        st.error(f"API 서버에 연결할 수 없습니다. FastAPI 서버가 실행 중인지 확인하세요. ({API_URL})")
+        return False
+    except Exception as e:
+        st.error(f"현재 진단 초기화 실패: {e}")
+        return False
+
+
 def get_disk_detail(serial: str) -> dict[str, Any] | None:
     try:
         res = requests.get(f"{API_URL}/api/disks/{serial}", timeout=5)
@@ -776,8 +791,15 @@ with st.sidebar:
 # ─── 대시보드 ───────────────────────────────────────────
 if page == "대시보드":
     agent_id_filter = st.session_state.get("agent_id_filter", "").strip()
-    current_disks = get_current_disks(agent_id_filter) if agent_id_filter else []
+    current_disks = get_current_disks(agent_id_filter or None)
     all_disks = get_disks()
+
+    if st.session_state.pop("current_clear_message", None):
+        st.success("현재 진단 표시가 초기화되었습니다.")
+
+    if st.button("현재 진단 초기화", help="상단 전체 현황, 시스템 분석, 주의가 필요한 디스크 영역만 비웁니다. 하단 전체 디스크 목록은 유지됩니다."):
+        if clear_current_disks(agent_id_filter or None):
+            st.rerun()
 
     render_summary(current_disks)
     if current_disks:

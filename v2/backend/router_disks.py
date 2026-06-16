@@ -81,6 +81,33 @@ def get_current_disks(
     return [disk_to_dict(d) for d in disks]
 
 
+@router.delete("/disks/current")
+def clear_current_disks(
+    agent_id: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """대시보드 상단 '현재 진단' 표시만 초기화한다. 전체 디스크 목록과 진단 이력은 유지한다."""
+    latest_query = db.query(DiagnosisLog).filter(DiagnosisLog.scan_id.isnot(None))
+    if agent_id:
+        latest_query = latest_query.filter(DiagnosisLog.agent_id == agent_id)
+
+    latest = latest_query.order_by(DiagnosisLog.timestamp.desc()).first()
+    if not latest or not latest.scan_id:
+        return {"cleared": 0, "message": "초기화할 현재 진단 데이터가 없습니다."}
+
+    disks_query = db.query(Disk).filter(Disk.last_scan_id == latest.scan_id)
+    if latest.agent_id:
+        disks_query = disks_query.filter(Disk.agent_id == latest.agent_id)
+
+    disks = disks_query.all()
+    cleared = len(disks)
+    for disk in disks:
+        disk.last_scan_id = None
+
+    db.commit()
+    return {"cleared": cleared, "message": f"현재 진단 {cleared}개가 초기화되었습니다."}
+
+
 @router.get("/disks/{serial}")
 def get_disk_history(serial: str, db: Session = Depends(get_db)) -> dict[str, Any]:
     """특정 디스크 진단 이력 조회"""
