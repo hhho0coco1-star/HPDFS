@@ -29,3 +29,6 @@ Thumbs.db
 .idea/
 .vscode/
 v1/data/*.zip
+
+# 생성된 PDF (스크립트로 재생성 가능)
+docs/*.pdf

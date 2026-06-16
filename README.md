@@ -108,7 +108,7 @@ git clone https://github.com/hhho0coco1-star/HPDFS.git
 cd HPDFS/v2
 
 # 2. 컨테이너 빌드 및 실행
-docker compose up -d --build
+docker compose up -d
 
 # 3. 브라우저 접속
 # http://localhost

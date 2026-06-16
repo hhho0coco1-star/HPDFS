@@ -15,7 +15,7 @@ services:
       - pdfs-network
 
   backend:
-    build: ./backend
+    image: melooong/pdfs-backend:latest
     container_name: pdfs_backend
     environment:
       DATABASE_URL: postgresql://pdfs:pdfs1234@postgresql:5432/pdfs
@@ -26,7 +26,7 @@ services:
       - pdfs-network
 
   frontend:
-    build: ./frontend
+    image: melooong/pdfs-frontend:latest
     container_name: pdfs_frontend
     environment:
       API_URL: http://backend:8010
@@ -37,7 +37,7 @@ services:
       - pdfs-network
 
   nginx:
-    build: ./nginx
+    image: melooong/pdfs-nginx:latest
     container_name: pdfs_nginx
     ports:
       - "80:80"

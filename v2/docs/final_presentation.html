@@ -154,7 +154,10 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px 20px;
       margin-top: 0;
-      max-width: 1280px;
+      width: 100%;
+      flex: 1;
+      align-content: stretch;
+      grid-auto-rows: 1fr;
     }
 
     .toc-item,
@@ -365,53 +368,52 @@
 
     .reflection-grid {
       display: grid;
-      grid-template-columns: repeat(5, 220px);
-      justify-content: space-between;
-      gap: 10px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
     }
 
     .note-card {
-      width: 220px;
-      min-height: 420px;
+      min-height: 360px;
       border-style: dashed;
       padding: 16px;
       overflow: hidden;
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
     }
 
     .note-card h3 {
       width: 100%;
-      font-size: 19px;
+      font-size: 17px;
       display: flex;
       justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
-      white-space: nowrap;
+      flex-wrap: wrap;
       box-sizing: border-box;
     }
 
     .note-card .role {
-      width: 110px;
-      max-width: 110px;
       text-align: center;
-      padding: 5px 8px;
-      font-size: 15px;
+      padding: 4px 8px;
+      font-size: 13px;
       white-space: nowrap;
       overflow: hidden;
       box-sizing: border-box;
     }
 
     .note-area {
-      margin: 14px auto 0;
-      width: 174px;
-      height: 304px;
+      margin: 12px 0 0;
+      width: 100%;
+      flex: 1;
+      min-height: 180px;
       border-radius: 10px;
       border: 1px solid var(--line);
       background: rgba(4, 8, 13, 0.62);
       padding: 14px;
       color: var(--muted);
-      font-size: 16px;
-      line-height: 1.48;
+      font-size: 15px;
+      line-height: 1.55;
       overflow: hidden;
       word-break: keep-all;
       overflow-wrap: break-word;
@@ -472,6 +474,44 @@
       border: 1px solid var(--line);
       border-radius: 999px;
       padding: 10px 13px;
+    }
+
+    @media print {
+      @page {
+        size: 1280px 720px;
+        margin: 0;
+      }
+
+      html, body {
+        width: 1280px;
+        height: 720px;
+        overflow: visible !important;
+        background: var(--bg) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .deck {
+        width: 1280px;
+        height: auto;
+      }
+
+      .slide {
+        display: flex !important;
+        width: 1280px !important;
+        height: 720px !important;
+        page-break-after: always;
+        break-after: page;
+        overflow: hidden;
+      }
+
+      .controls {
+        display: none !important;
+      }
+
+      .frame-shell, iframe {
+        min-height: 500px;
+      }
     }
 
     @media (max-width: 1100px) {
@@ -572,7 +612,7 @@
             <div class="toc-no">12</div>
             <div class="toc-name">느낀점</div>
           </div>
-          <div class="toc-item">
+          <div class="toc-item" style="grid-column: 1 / -1; justify-self: center; width: calc(50% - 10px);">
             <div class="toc-no">13</div>
             <div class="toc-name">향후 계획</div>
           </div>
