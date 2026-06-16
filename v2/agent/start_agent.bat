@@ -1,4 +1,9 @@
 @echo off
+
+chcp 65001 >nul
+set PYTHONUTF8=1
+set PYTHONIOENCODING=utf-8
+
 title PDFS Agent
 echo ============================================================
 echo  PDFS 에이전트 시작
@@ -10,3 +15,9 @@ cd /d "%~dp0"
 python agent.py
 
 pause
+
+ 
+
+
+
+

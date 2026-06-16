@@ -60,7 +60,7 @@
 
     .slide-kicker {
       color: var(--blue);
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       letter-spacing: 0;
       margin-bottom: 12px;
@@ -365,35 +365,58 @@
 
     .reflection-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(5, 220px);
+      justify-content: space-between;
+      gap: 10px;
     }
 
     .note-card {
-      min-height: 426px;
+      width: 220px;
+      min-height: 420px;
       border-style: dashed;
+      padding: 16px;
+      overflow: hidden;
+      box-sizing: border-box;
     }
 
     .note-card h3 {
-      font-size: 21px;
+      width: 100%;
+      font-size: 19px;
       display: flex;
       justify-content: space-between;
-      gap: 12px;
+      gap: 8px;
       align-items: center;
+      white-space: nowrap;
+      box-sizing: border-box;
+    }
+
+    .note-card .role {
+      width: 110px;
+      max-width: 110px;
+      text-align: center;
+      padding: 5px 8px;
+      font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      box-sizing: border-box;
     }
 
     .note-area {
-      margin-top: 16px;
-      height: 276px;
+      margin: 14px auto 0;
+      width: 174px;
+      height: 304px;
       border-radius: 10px;
       border: 1px solid var(--line);
       background: rgba(4, 8, 13, 0.62);
-      padding: 18px;
+      padding: 14px;
       color: var(--muted);
-      font-size: 15px;
-      line-height: 1.58;
-      white-space: pre-line;
+      font-size: 16px;
+      line-height: 1.48;
       overflow: hidden;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      white-space: normal;
+      box-sizing: border-box;
     }
 
     .bottom-note {
@@ -775,27 +798,23 @@
         <div class="reflection-grid">
           <div class="note-card">
             <h3>김응석 <span class="role">Data / ML</span></h3>
-            <div class="note-area">느낀점:</div>
+            <div class="note-area">데이터 분석에서 분류를 수행하며 두 사례가 불균형할 때 생기는 문제와 해결 방법을 고민했고, 이 과정에서 많은 공부가 되었습니다.</div>
           </div>
           <div class="note-card">
             <h3>홍제규 <span class="role">Backend / DB</span></h3>
-            <div class="note-area">기계학습 모델의 성능은 알고리즘 선택도 중요하지만, 데이터 이해와 전처리 과정에 크게 좌우된다는 점을 배웠습니다. 다양한 특징(feature) 중 고장
-              예측에 유의미한 정보를 분석하며, 특성 선택과 데이터 이해의 중요성을 배울 수 있었습니다.</div>
+            <div class="note-area">기계학습 모델은 알고리즘뿐 아니라 데이터 이해와 전처리에 크게 좌우된다는 점을 배웠습니다. 유의미한 feature를 분석하며 특성 선택의 중요성을 알 수 있었습니다.</div>
           </div>
           <div class="note-card">
             <h3>장영재 <span class="role">Frontend</span></h3>
-            <div class="note-area">프론트엔드를 담당하며 저장장치 상태와 AI 예측 결과를 한눈에 확인할 수 있는 대시보드를 구현했습니다. API 연동을 통해 데이터 흐름을 이해했고,
-              사용자 관점에서 정보를 시각화하는 방법과 협업의 중요성을 배울 수 있었습니다.</div>
+            <div class="note-area">프론트엔드를 담당하며 저장장치 상태와 AI 예측 결과를 한눈에 볼 수 있는 대시보드를 구현했습니다. API 연동과 시각화 과정을 통해 사용자 관점의 중요성을 배웠습니다.</div>
           </div>
           <div class="note-card">
             <h3>안세웅 <span class="role">Infra / Agent</span></h3>
-            <div class="note-area">Docker Compose로 Backend, Frontend, DB, Nginx를 단일 환경으로 묶어 팀원 간 환경 차이를 줄일 수 있었습니다.
-              smartctl 바이너리를 레포에 포함한 결정도 도움이 되었고, 컨테이너 기반 배포가 협업 생산성에 왜 중요한지 체감할 수 있었습니다.</div>
+            <div class="note-area">Docker Compose로 Backend, Frontend, DB, Nginx를 단일 환경으로 묶어 환경 차이를 줄였습니다. smartctl 동봉과 컨테이너 배포가 협업 생산성에 중요하다는 점을 체감했습니다.</div>
           </div>
           <div class="note-card">
             <h3>이성룡 <span class="role">Backend / DB</span></h3>
-            <div class="note-area">JS, Spring Boot가 아닌 다른 기술로 프로젝트를 구현하게 되어 많은 어려움이 있었지만, FastAPI, PostgreSQL, Docker
-              Compose 등의 새로운 지식을 습득하며 한 단계 더 성장할 수 있는 시간이었습니다.</div>
+            <div class="note-area">JS와 Spring Boot가 아닌 기술로 구현하며 어려움도 있었지만, FastAPI, PostgreSQL, Docker Compose를 익히며 한 단계 더 성장할 수 있었습니다.</div>
           </div>
         </div>
       </div>
