@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 from datetime import datetime
+from uuid import uuid4
 
 import requests
 
@@ -17,6 +18,7 @@ def collect_and_send():
     try:
         devices = scan_devices()
         log(f"디스크 {len(devices)}개 감지")
+        scan_id = datetime.now().strftime("%Y%m%d%H%M%S") + "-" + uuid4().hex[:8]
     except Exception as e:
         log(f"디스크 스캔 실패: {e}")
         return
@@ -27,6 +29,7 @@ def collect_and_send():
             df = extract_features(device)
             row = df.iloc[0].to_dict()
             payload = {
+                "scan_id":        scan_id,
                 "serial":         str(row.get("serial", "UNKNOWN")),
                 "device":         device_str,
                 "model":          str(row.get("model", "Unknown")),

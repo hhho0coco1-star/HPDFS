@@ -29,22 +29,44 @@ def demo_disks() -> list[dict]:
     ]
 
 
+def disk_to_dict(d: Disk) -> dict[str, Any]:
+    return {
+        "serial":        d.serial,
+        "model":         d.model,
+        "capacity_bytes":d.capacity_bytes,
+        "final_level":   d.final_level,
+        "risk":          d.risk,
+        "action_status": d.action_status,
+        "last_updated":  d.last_updated.strftime("%Y-%m-%d %H:%M:%S") if d.last_updated else None,
+    }
+
+
 @router.get("/disks")
 def get_disks(db: Session = Depends(get_db)) -> list[dict[str, Any]]:
     """전체 디스크 현재 상태 목록 조회"""
     disks = db.query(Disk).order_by(Disk.risk.desc()).all()
-    return [
-        {
-            "serial":        d.serial,
-            "model":         d.model,
-            "capacity_bytes":d.capacity_bytes,
-            "final_level":   d.final_level,
-            "risk":          d.risk,
-            "action_status": d.action_status,
-            "last_updated":  d.last_updated.strftime("%Y-%m-%d %H:%M:%S") if d.last_updated else None,
-        }
-        for d in disks
-    ]
+    return [disk_to_dict(d) for d in disks]
+
+
+@router.get("/disks/current")
+def get_current_disks(db: Session = Depends(get_db)) -> list[dict[str, Any]]:
+    """가장 최근 Agent 수집 묶음에 포함된 디스크만 조회"""
+    latest = (
+        db.query(DiagnosisLog.scan_id)
+        .filter(DiagnosisLog.scan_id.isnot(None))
+        .order_by(DiagnosisLog.timestamp.desc())
+        .first()
+    )
+    if not latest or not latest[0]:
+        return []
+
+    disks = (
+        db.query(Disk)
+        .filter(Disk.last_scan_id == latest[0])
+        .order_by(Disk.risk.desc())
+        .all()
+    )
+    return [disk_to_dict(d) for d in disks]
 
 
 @router.get("/disks/{serial}")

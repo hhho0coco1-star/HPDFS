@@ -8,6 +8,7 @@ class DiagnosisLog(Base):
     __tablename__ = "diagnosis_log"
 
     id              = Column(Integer, primary_key=True, index=True)
+    scan_id         = Column(String, index=True)
     timestamp       = Column(DateTime, default=datetime.now)
     serial          = Column(String, index=True)
     device          = Column(String)
@@ -38,4 +39,5 @@ class Disk(Base):
     final_level     = Column(String)
     risk            = Column(Float)
     action_status   = Column(String, default="미확인")               # F-08: 미확인 / 확인됨 / 조치완료
+    last_scan_id    = Column(String, index=True)
     last_updated    = Column(DateTime, default=datetime.now)

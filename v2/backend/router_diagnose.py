@@ -15,6 +15,7 @@ router = APIRouter()
 
 class SmartData(BaseModel):
     """에이전트가 보내는 SMART 수치"""
+    scan_id:        str | None = None   # 한 번의 Agent 수집 묶음을 구분하는 ID
     serial:         str   = "UNKNOWN"   # 디스크 고유 시리얼 넘버
     device:         str   = ""          # 연결 경로 참고용 (/dev/sda 등)
     model:          str
@@ -58,6 +59,7 @@ def diagnose(request: Request, data: SmartData, db: Session = Depends(get_db)) -
     # ③ diagnosis_log 저장 (수동진단 제외)
     if not is_manual:
         log = DiagnosisLog(
+            scan_id        = data.scan_id,
             timestamp      = datetime.now(),
             serial         = data.serial,
             device         = data.device,
@@ -86,6 +88,7 @@ def diagnose(request: Request, data: SmartData, db: Session = Depends(get_db)) -
             disk.capacity_bytes= data.capacity_bytes
             disk.final_level   = result["final"]
             disk.risk          = round(result["prob"] * 100, 2)
+            disk.last_scan_id  = data.scan_id
             disk.last_updated  = datetime.now()
         else:
             db.add(Disk(
@@ -95,6 +98,7 @@ def diagnose(request: Request, data: SmartData, db: Session = Depends(get_db)) -
                 capacity_bytes = data.capacity_bytes,
                 final_level    = result["final"],
                 risk           = round(result["prob"] * 100, 2),
+                last_scan_id   = data.scan_id,
                 action_status  = "미확인",
                 last_updated   = datetime.now(),
             ))

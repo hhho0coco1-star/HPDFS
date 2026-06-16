@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          # previous image: melooong/pdfs-backend:latest
+        # image : meloong/pdfs-backend:latest # 이전 로컬버전
           image: 256688076284.dkr.ecr.ap-northeast-2.amazonaws.com/hpdfs-backend:latest
           imagePullPolicy: IfNotPresent
           env:
@@ -46,5 +46,4 @@ spec:
               port: 8010
             initialDelaySeconds: 5
             periodSeconds: 10
-
 

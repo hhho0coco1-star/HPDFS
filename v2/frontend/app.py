@@ -303,6 +303,19 @@ def get_disks() -> list[dict[str, Any]]:
         return []
 
 
+def get_current_disks() -> list[dict[str, Any]]:
+    try:
+        res = requests.get(f"{API_URL}/api/disks/current", timeout=5)
+        res.raise_for_status()
+        return res.json()
+    except requests.exceptions.ConnectionError:
+        st.error(f"API 서버에 연결할 수 없습니다. FastAPI 서버가 실행 중인지 확인하세요. ({API_URL})")
+        return []
+    except Exception as e:
+        st.error(f"현재 진단 디스크 조회 실패: {e}")
+        return []
+
+
 def get_disk_detail(serial: str) -> dict[str, Any] | None:
     try:
         res = requests.get(f"{API_URL}/api/disks/{serial}", timeout=5)
@@ -738,16 +751,19 @@ with st.sidebar:
 
 # ─── 대시보드 ───────────────────────────────────────────
 if page == "대시보드":
-    disks = get_disks()
-    render_summary(disks)
-    if disks:
-        render_charts(disks)
-        render_risk_cards(disks)
-        render_table(disks)
-        render_toast(disks)
+    current_disks = get_current_disks()
+    all_disks = get_disks()
+
+    render_summary(current_disks)
+    if current_disks:
+        render_charts(current_disks)
+        render_risk_cards(current_disks)
+        render_toast(current_disks)
     else:
         st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
-        st.info("디스크 데이터가 없습니다. 사이드바에서 '데모 모드'를 켜보세요.")
+        st.info("현재 진단된 디스크 데이터가 없습니다. Agent를 실행하면 상단 현황에 반영됩니다.")
+
+    render_table(all_disks)
 
 # ─── 자동진단 ───────────────────────────────────────────
 elif page == "자동진단":

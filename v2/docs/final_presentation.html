@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -162,7 +163,7 @@
     .stack-card,
     .note-card {
       border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
       border-radius: 12px;
       padding: 22px;
       box-shadow: 0 14px 38px rgba(0, 0, 0, 0.18);
@@ -402,10 +403,21 @@
       margin-top: 6px;
     }
 
-    .accent-blue { border-left: 5px solid var(--blue); }
-    .accent-green { border-left: 5px solid var(--green); }
-    .accent-amber { border-left: 5px solid var(--amber); }
-    .accent-danger { border-left: 5px solid var(--danger); }
+    .accent-blue {
+      border-left: 5px solid var(--blue);
+    }
+
+    .accent-green {
+      border-left: 5px solid var(--green);
+    }
+
+    .accent-amber {
+      border-left: 5px solid var(--amber);
+    }
+
+    .accent-danger {
+      border-left: 5px solid var(--danger);
+    }
 
     .controls {
       position: fixed;
@@ -472,6 +484,7 @@
     }
   </style>
 </head>
+
 <body>
   <main class="deck">
     <section class="slide cover-slide active" data-title="HPDFS">
@@ -488,19 +501,58 @@
       </div>
       <div class="content">
         <div class="toc-grid">
-          <div class="toc-item"><div class="toc-no">01</div><div class="toc-name">프로젝트 개요</div></div>
-          <div class="toc-item"><div class="toc-no">02</div><div class="toc-name">팀원 소개</div></div>
-          <div class="toc-item"><div class="toc-no">03</div><div class="toc-name">기술 스택</div></div>
-          <div class="toc-item"><div class="toc-no">04</div><div class="toc-name">WBS</div></div>
-          <div class="toc-item"><div class="toc-no">05</div><div class="toc-name">요구사항 명세서</div></div>
-          <div class="toc-item"><div class="toc-no">06</div><div class="toc-name">메뉴 트리 / 사용자 시나리오</div></div>
-          <div class="toc-item"><div class="toc-no">07</div><div class="toc-name">와이어프레임</div></div>
-          <div class="toc-item"><div class="toc-no">08</div><div class="toc-name">스토리보드</div></div>
-          <div class="toc-item"><div class="toc-no">09</div><div class="toc-name">테이블 정의서 / ERD</div></div>
-          <div class="toc-item"><div class="toc-no">10</div><div class="toc-name">테스트 케이스</div></div>
-          <div class="toc-item"><div class="toc-no">11</div><div class="toc-name">트러블 슈팅 및 회고</div></div>
-          <div class="toc-item"><div class="toc-no">12</div><div class="toc-name">느낀점</div></div>
-          <div class="toc-item"><div class="toc-no">13</div><div class="toc-name">향후 계획</div></div>
+          <div class="toc-item">
+            <div class="toc-no">01</div>
+            <div class="toc-name">프로젝트 개요</div>
+          </div>
+          <div class="toc-item">
+            <div class="toc-no">02</div>
+            <div class="toc-name">팀원 소개</div>
+          </div>
+          <div class="toc-item">
+            <div class="toc-no">03</div>
+            <div class="toc-name">기술 스택</div>
+          </div>
+          <div class="toc-item">
+            <div class="toc-no">04</div>
+            <div class="toc-name">WBS</div>
+          </div>
+          <div class="toc-item">
+            <div class="toc-no">05</div>
+            <div class="toc-name">요구사항 명세서</div>
+          </div>
+          <div class="toc-item">
+            <div class="toc-no">06</div>
+            <div class="toc-name">메뉴 트리 / 사용자 시나리오</div>
+          </div>
+          <div class="toc-item">
+            <div class="toc-no">07</div>
+            <div class="toc-name">와이어프레임</div>
+          </div>
+          <div class="toc-item">
+            <div class="toc-no">08</div>
+            <div class="toc-name">스토리보드</div>
+          </div>
+          <div class="toc-item">
+            <div class="toc-no">09</div>
+            <div class="toc-name">테이블 정의서 / ERD</div>
+          </div>
+          <div class="toc-item">
+            <div class="toc-no">10</div>
+            <div class="toc-name">테스트 케이스</div>
+          </div>
+          <div class="toc-item">
+            <div class="toc-no">11</div>
+            <div class="toc-name">트러블 슈팅 및 회고</div>
+          </div>
+          <div class="toc-item">
+            <div class="toc-no">12</div>
+            <div class="toc-name">느낀점</div>
+          </div>
+          <div class="toc-item">
+            <div class="toc-no">13</div>
+            <div class="toc-name">향후 계획</div>
+          </div>
         </div>
       </div>
     </section>
@@ -727,19 +779,23 @@
           </div>
           <div class="note-card">
             <h3>홍제규 <span class="role">Backend / DB</span></h3>
-            <div class="note-area">기계학습 모델의 성능은 알고리즘 선택도 중요하지만, 데이터 이해와 전처리 과정에 크게 좌우된다는 점을 배웠습니다. 다양한 특징(feature) 중 고장 예측에 유의미한 정보를 분석하며, 특성 선택과 데이터 이해의 중요성을 배울 수 있었습니다.</div>
+            <div class="note-area">기계학습 모델의 성능은 알고리즘 선택도 중요하지만, 데이터 이해와 전처리 과정에 크게 좌우된다는 점을 배웠습니다. 다양한 특징(feature) 중 고장
+              예측에 유의미한 정보를 분석하며, 특성 선택과 데이터 이해의 중요성을 배울 수 있었습니다.</div>
           </div>
           <div class="note-card">
             <h3>장영재 <span class="role">Frontend</span></h3>
-            <div class="note-area">프론트엔드를 담당하며 저장장치 상태와 AI 예측 결과를 한눈에 확인할 수 있는 대시보드를 구현했습니다. API 연동을 통해 데이터 흐름을 이해했고, 사용자 관점에서 정보를 시각화하는 방법과 협업의 중요성을 배울 수 있었습니다.</div>
+            <div class="note-area">프론트엔드를 담당하며 저장장치 상태와 AI 예측 결과를 한눈에 확인할 수 있는 대시보드를 구현했습니다. API 연동을 통해 데이터 흐름을 이해했고,
+              사용자 관점에서 정보를 시각화하는 방법과 협업의 중요성을 배울 수 있었습니다.</div>
           </div>
           <div class="note-card">
             <h3>안세웅 <span class="role">Infra / Agent</span></h3>
-            <div class="note-area">Docker Compose로 Backend, Frontend, DB, Nginx를 단일 환경으로 묶어 팀원 간 환경 차이를 줄일 수 있었습니다. smartctl 바이너리를 레포에 포함한 결정도 도움이 되었고, 컨테이너 기반 배포가 협업 생산성에 왜 중요한지 체감할 수 있었습니다.</div>
+            <div class="note-area">Docker Compose로 Backend, Frontend, DB, Nginx를 단일 환경으로 묶어 팀원 간 환경 차이를 줄일 수 있었습니다.
+              smartctl 바이너리를 레포에 포함한 결정도 도움이 되었고, 컨테이너 기반 배포가 협업 생산성에 왜 중요한지 체감할 수 있었습니다.</div>
           </div>
           <div class="note-card">
             <h3>이성룡 <span class="role">Backend / DB</span></h3>
-            <div class="note-area">JS, Spring Boot가 아닌 다른 기술로 프로젝트를 구현하게 되어 많은 어려움이 있었지만, FastAPI, PostgreSQL, Docker Compose 등의 새로운 지식을 습득하며 한 단계 더 성장할 수 있는 시간이었습니다.</div>
+            <div class="note-area">JS, Spring Boot가 아닌 다른 기술로 프로젝트를 구현하게 되어 많은 어려움이 있었지만, FastAPI, PostgreSQL, Docker
+              Compose 등의 새로운 지식을 습득하며 한 단계 더 성장할 수 있는 시간이었습니다.</div>
           </div>
         </div>
       </div>
@@ -863,4 +919,5 @@
     showSlide(0);
   </script>
 </body>
+
 </html>
