@@ -794,12 +794,7 @@ if page == "대시보드":
     current_disks = get_current_disks(agent_id_filter or None)
     all_disks = get_disks()
 
-    if st.session_state.pop("current_clear_message", None):
-        st.success("현재 진단 표시가 초기화되었습니다.")
-
-    if st.button("현재 진단 초기화", help="상단 전체 현황, 시스템 분석, 주의가 필요한 디스크 영역만 비웁니다. 하단 전체 디스크 목록은 유지됩니다."):
-        if clear_current_disks(agent_id_filter or None):
-            st.rerun()
+    clear_message = st.session_state.pop("current_clear_message", None)
 
     render_summary(current_disks)
     if current_disks:
@@ -811,6 +806,16 @@ if page == "대시보드":
         st.info("현재 진단된 디스크 데이터가 없습니다. Agent 실행창의 Agent ID를 확인하거나 Agent를 실행하면 상단 현황에 반영됩니다.")
 
     render_table(all_disks)
+
+    st.markdown("<div style='margin-top: 8px;'></div>", unsafe_allow_html=True)
+    clear_col, msg_col = st.columns([1, 5])
+    with clear_col:
+        if st.button("현재 진단 초기화", help="시연 전 상단 현재 진단 영역만 비웁니다. 하단 전체 디스크 목록은 유지됩니다."):
+            if clear_current_disks(agent_id_filter or None):
+                st.rerun()
+    with msg_col:
+        if clear_message:
+            st.caption(clear_message)
 
 # ─── 자동진단 ───────────────────────────────────────────
 elif page == "자동진단":
