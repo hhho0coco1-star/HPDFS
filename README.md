@@ -1,4 +1,4 @@
-# PDFS — Predictive Drive Failure System
+# HPDFS — Heopung Predictive Drive Failure System
 
 > HDD/SSD SMART 데이터를 수집·분석해 고장을 사전에 예측하는 시스템.  
 > 온프레미스 EXE 도구(v1)에서 클라우드 인프라(v2)로 전환한 포트폴리오 프로젝트입니다.
@@ -75,7 +75,7 @@ flowchart TD
 | 인프라 | 없음 | Docker Compose + Kubernetes |
 | CI/CD | 없음 | GitHub Actions + Docker Hub (melooong/pdfs-*) |
 | 배포 | EXE 파일 | 컨테이너 이미지 |
-| 테스트 | 없음 | pytest 21개 (predictor + API 응답 검증) |
+| 테스트 | 없음 | pytest 22개 (predictor + API 응답 검증) |
 
 ---
 
@@ -160,10 +160,10 @@ HPDFS/
 ```bash
 cd v2/backend
 pytest tests/ -v
-# 21 passed
+# 22 passed
 ```
 
 | 파일 | 테스트 수 | 내용 |
 |------|----------|------|
-| `tests/test_predictor.py` | 16개 | prob_to_level, rule_level, combine_level 경계값 검증 |
+| `tests/test_predictor.py` | 17개 | prob_to_level, rule_level, combine_level 경계값 검증 |
 | `tests/test_router_diagnose.py` | 5개 | API 응답 형식, MANUAL 저장 방지, 503 방어 |
